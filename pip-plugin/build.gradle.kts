@@ -1,23 +1,57 @@
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.25"
-    id("org.jetbrains.intellij") version "1.17.4"
+    id("org.jetbrains.kotlin.jvm") version "2.1.0"
+    id("org.jetbrains.intellij.platform") version "2.2.0"
 }
 
+val v = "1.33.7"
 group = "com.glycin"
-version = "1.0-SNAPSHOT"
+version = v
 
 repositories {
     mavenCentral()
+
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2024.1.7")
-    type.set("IC") // Target IDE Platform
+intellijPlatform  {
+    pluginConfiguration {
+        id = "pip"
+        name = "P.I.P"
+        version = v
 
-    plugins.set(listOf(/* Plugin Dependencies */))
+        ideaVersion {
+            sinceBuild = "232"
+            untilBuild = provider { null }
+        }
+
+        vendor {
+            name = "Glycin"
+            url = "https://github.com/glycin"
+        }
+    }
+
+
+    publishing {}
+
+    signing{}
+}
+
+dependencies {
+    intellijPlatform{
+        intellijIdeaCommunity("2024.2.3")
+        bundledPlugin("com.intellij.java")
+        pluginVerifier()
+        zipSigner()
+        testFramework(TestFrameworkType.Platform)
+    }
+
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 }
 
 tasks {
@@ -26,22 +60,10 @@ tasks {
         sourceCompatibility = "17"
         targetCompatibility = "17"
     }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
-    }
+}
 
-    patchPluginXml {
-        sinceBuild.set("241")
-        untilBuild.set("243.*")
-    }
-
-    signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
-
-    publishPlugin {
-        token.set(System.getenv("PUBLISH_TOKEN"))
+kotlin{
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }

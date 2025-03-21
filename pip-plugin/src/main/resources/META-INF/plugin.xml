@@ -25,6 +25,15 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-
     </extensions>
+
+    <actions>
+        <action id="InputDialogAction"
+                class="com.glycin.pipp.InputDialogAction"
+                text="Show Input Dialog"
+                description="Opens an input dialog">
+            <add-to-group group-id="MainMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl P"/>
+        </action>
+    </actions>
 </idea-plugin>
