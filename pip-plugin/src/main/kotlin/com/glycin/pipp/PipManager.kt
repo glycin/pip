@@ -1,13 +1,16 @@
 package com.glycin.pipp
 
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import kotlinx.coroutines.CoroutineScope
 
-class InputDialogAction: AnAction() {
+class PipManager(
+    private val scope: CoroutineScope,
+    private val project: Project,
+): Disposable {
 
-    override fun actionPerformed(e: AnActionEvent) {
-        val project = e.project
+    fun showInput() {
         println("doing action")
         val input = Messages.showInputDialog(
             project,
@@ -21,5 +24,9 @@ class InputDialogAction: AnAction() {
         } else {
             println("cancelled")
         }
+    }
+
+    override fun dispose() {
+        //TODO: Cleanup
     }
 }
