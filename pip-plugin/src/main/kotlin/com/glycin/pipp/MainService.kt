@@ -7,28 +7,28 @@ import kotlinx.coroutines.CoroutineScope
 import java.awt.KeyboardFocusManager
 
 @Service(Service.Level.APP)
-class PipService(
+class MainService(
     private val scope: CoroutineScope,
 ): Disposable {
 
-    private var pipInput: PipInput? = null
-    private var pipManager: PipManager? = null
+    private var inputHandler: InputHandler? = null
+    private var manager: Manager? = null
 
     fun init(project: Project) {
-        if(pipManager != null) { return }
-        pipManager = PipManager(scope, project).also { pm ->
-            pipInput = PipInput(pm).also { pi ->
+        if(manager != null) { return }
+        manager = Manager(scope, project).also { pm ->
+            inputHandler = InputHandler(pm).also { pi ->
                 KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(pi)
             }
         }
     }
 
     override fun dispose() {
-        pipInput?.let {
+        inputHandler?.let {
             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(it)
         }
-        pipInput = null
-        pipManager?.dispose()
-        pipManager = null
+        inputHandler = null
+        manager?.dispose()
+        manager = null
     }
 }

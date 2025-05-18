@@ -3,8 +3,8 @@ package com.glycin.pipp
 import java.awt.KeyEventDispatcher
 import java.awt.event.KeyEvent
 
-class PipInput(
-    private val pipManager: PipManager
+class InputHandler(
+    private val manager: Manager
 ): KeyEventDispatcher {
 
     override fun dispatchKeyEvent(e: KeyEvent): Boolean {
@@ -13,7 +13,7 @@ class PipInput(
                 e.isAltDown &&
                 !e.isControlDown &&
                 !e.isShiftDown) {
-                pipManager.showInput()
+                manager.showInput()
                 return true
             }
         }

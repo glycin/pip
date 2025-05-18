@@ -1,6 +1,5 @@
 package com.glycin.pipp
 
-import com.glycin.pipp.model.Pip
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.ui.JBColor
@@ -13,7 +12,7 @@ import java.awt.Graphics2D
 import javax.swing.JComponent
 import kotlin.math.roundToInt
 
-class PipRenderer(
+class AgentComponent(
     private val pip: Pip,
     scope: CoroutineScope,
     fps : Long,
@@ -35,7 +34,8 @@ class PipRenderer(
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
         if(g is Graphics2D) {
-            drawPip(g)
+            pip.render(g)
+            //drawMovementPoints(g)
         }
     }
 
@@ -43,8 +43,11 @@ class PipRenderer(
         active = false
     }
 
-    private fun drawPip(g: Graphics) {
-        g.color = JBColor.RED
-        g.fillOval(pip.position.x.roundToInt(), pip.position.y.roundToInt(), pip.width, pip.height)
+    private fun drawMovementPoints(g: Graphics) {
+        g.color = JBColor.BLUE
+        g.fillRect(pip.position.x.roundToInt(), pip.position.y.roundToInt(), pip.width, pip.height)
+        g.fillRect(pip.position.x.roundToInt() + 450, pip.position.y.roundToInt(), pip.width, pip.height)
+        g.fillRect(pip.position.x.roundToInt() + 450, pip.position.y.roundToInt() - 200, pip.width, pip.height)
+        g.fillRect(pip.position.x.roundToInt() + 450, pip.position.y.roundToInt() - 400, pip.width, pip.height)
     }
 }

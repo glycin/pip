@@ -7,6 +7,6 @@ import com.intellij.openapi.startup.ProjectActivity
 class StartupActivity: ProjectActivity {
 
     override suspend fun execute(project: Project) {
-        ApplicationManager.getApplication().getService(PipService::class.java).init(project)
+        ApplicationManager.getApplication().getService(MainService::class.java).init(project)
     }
 }

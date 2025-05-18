@@ -23,6 +23,14 @@ data class Vec2(
             val dy = (b.y - a.y)
             return sqrt(dx * dx + dy * dy)
         }
+
+        fun lerp(start: Vec2, end: Vec2, t: Float): Vec2 {
+            val clampedT = t.coerceIn(0f, 1f)
+            return Vec2(
+                start.x + (end.x - start.x) * clampedT,
+                start.y + (end.y - start.y) * clampedT
+            )
+        }
     }
 
     operator fun plus(other: Vec2) = Vec2(x + other.x, y + other.y)
@@ -34,6 +42,12 @@ data class Vec2(
     operator fun minus(other: Float) = Vec2(x - other, y - other)
     operator fun times(scalar: Float) = Vec2(x * scalar, y * scalar)
     operator fun div(scalar: Float) = Vec2(x / scalar, y / scalar)
+
+    fun normalize(): Vec2 {
+        val length = sqrt(x * x + y * y)
+        if (length == 0f) return Vec2(0f, 0f)
+        return Vec2(x / length, y / length)
+    }
 
     override fun toString(): String {
         return "Vec2($x,$y)"
