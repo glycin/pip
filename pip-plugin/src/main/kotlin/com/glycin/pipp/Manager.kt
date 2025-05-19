@@ -1,6 +1,8 @@
 package com.glycin.pipp
 
+import com.glycin.pipp.explosion.BoomManager
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
@@ -8,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.awt.Point
 import java.awt.Rectangle
 import kotlin.math.roundToInt
 
@@ -48,8 +51,8 @@ class Manager(
         )
 
         if(input != null) {
-            scope.launch(Dispatchers.Default) {
-                delay(1500)
+            scope.launch(Dispatchers.EDT) {
+                delay(2500)
                 println("Sit")
                 pip.changeStateTo(PipState.SITTING)
                 delay(2000)
@@ -70,7 +73,11 @@ class Manager(
                 delay(2000)
                 println("Shoot")
                 pip.changeStateTo(PipState.WALL_SHOOTING)
-                delay(5000)
+                delay(1000)
+                println("Hang again")
+                BoomManager(scope).explode(Point(100, 100), editor!!)
+                pip.changeStateTo(PipState.HANG_IDLE)
+                delay(2000)
             }
         } else {
             println("cancelled")
