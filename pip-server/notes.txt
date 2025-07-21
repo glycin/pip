@@ -1,0 +1,13 @@
+MODEL: ollama pull qwen3:8b
+QWEN 3 thinking mode on "blabla bla text /think"
+
+QWEN 3 thinking mode off "blabla bla text /no_think"
+
+
+TODO:
+Add grafana dashboarding using spring ai observability? https://docs.spring.io/spring-ai/reference/observability/index.html
+
+FINDINGS:
+System calls overwrite the default system
+
+the nano-id guy has the github.com/ai url 0o

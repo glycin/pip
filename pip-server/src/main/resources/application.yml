@@ -1,0 +1,19 @@
+server:
+  port: 1337
+spring:
+  application:
+    name: pip-server
+  ai:
+    ollama:
+      chat:
+        options:
+          model: qwen3:8b
+
+logging:
+  level:
+    org:
+      springframework:
+        ai:
+          chat:
+            client:
+              advisor: DEBUG
