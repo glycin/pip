@@ -1,18 +1,17 @@
 package com.glycin.pipp
 
-import com.glycin.pipp.explosion.BoomManager
+import com.glycin.pipp.http.CodingRequestBody
+import com.glycin.pipp.http.PipRestClient
+import com.glycin.pipp.prompts.CodingPrompts
+import com.glycin.pipp.utils.NanoId
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.EDT
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.awt.Point
 import java.awt.Rectangle
-import kotlin.math.roundToInt
 
 private const val FPS = 120L
 
@@ -51,33 +50,17 @@ class Manager(
         )
 
         if(input != null) {
-            scope.launch(Dispatchers.EDT) {
-                delay(2500)
-                println("Sit")
-                pip.changeStateTo(PipState.SITTING)
-                delay(2000)
-                println("Walk")
-                pip.changeStateTo(PipState.WALKING)
-                pip.moveTo(Vec2(pip.position.x + 350, pip.position.y), 2000)
-                delay(2000)
-                println("Jump")
-                pip.changeStateTo(PipState.JUMPING)
-                pip.moveTo(Vec2(pip.position.x + 50, pip.position.y - 50), 250)
-                delay(250)
-                println("Climb")
-                pip.changeStateTo(PipState.CLIMBING)
-                pip.moveTo(Vec2(pip.position.x, pip.position.y - 200), 2000)
-                delay(2000)
-                println("hang")
-                pip.changeStateTo(PipState.HANG_IDLE)
-                delay(2000)
-                println("Shoot")
-                pip.changeStateTo(PipState.WALL_SHOOTING)
-                delay(1000)
-                println("Hang again")
-                BoomManager(scope).explode(Point(100, 100), editor!!)
-                pip.changeStateTo(PipState.HANG_IDLE)
-                delay(2000)
+            val context = getContext()
+            scope.launch(Dispatchers.IO) {
+                val response = PipRestClient.doCodeQuestion(
+                    codeRequest = CodingRequestBody(
+                        input = CodingPrompts.generateCodeRequestWithContext(input, context),
+                        think = false,
+                        chatId = NanoId.generate()
+                    )
+                )
+
+                TextWriter.replaceText(0, editor!!.document.textLength, response ?: "", editor, project)
             }
         } else {
             println("cancelled")
@@ -86,5 +69,10 @@ class Manager(
 
     override fun dispose() {
         agentComponent.dispose()
+    }
+
+    private fun getContext() : String {
+        val document = editor?.document
+        return document?.text ?: ""
     }
 }

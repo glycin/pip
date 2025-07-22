@@ -7,13 +7,12 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.serialization.gson.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.json.Json
 
-private const val baseUrl = "http://localhost:1337/"
+private const val baseUrl = "http://localhost:1337"
 
 object PipRestClient {
     private val client = HttpClient(CIO) {
@@ -24,9 +23,16 @@ object PipRestClient {
         }
 
         install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-            })
+            gson {
+                setPrettyPrinting()
+            }
+        }
+
+        engine {
+            endpoint {
+                keepAliveTime = 60000
+                connectTimeout = 60000
+            }
         }
     }
 
