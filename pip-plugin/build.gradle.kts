@@ -42,6 +42,9 @@ intellijPlatform  {
     signing{}
 }
 
+private val ktorVersion = "3.2.2"
+private val logbackVersion = "1.5.18"
+
 dependencies {
     intellijPlatform{
         intellijIdeaCommunity("2024.2.3")
@@ -51,6 +54,12 @@ dependencies {
         testFramework(TestFrameworkType.Platform)
     }
 
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 }
 

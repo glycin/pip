@@ -1,5 +1,6 @@
 package com.glycin.pipp
 
+import com.glycin.pipp.http.PipRestClient
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
@@ -24,6 +25,7 @@ class MainService(
     }
 
     override fun dispose() {
+        PipRestClient.close()
         inputHandler?.let {
             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(it)
         }

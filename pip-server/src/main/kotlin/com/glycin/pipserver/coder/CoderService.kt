@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux
 
 @Service
 class CoderService(
-    private val ollama: OllamaChatModel,
+    ollama: OllamaChatModel,
     chatMemory: ChatMemory,
 ) {
     private val pipCoder = ChatClient.builder(ollama)
@@ -22,21 +22,25 @@ class CoderService(
         )
         .build()
 
-    fun generate(userInput: String, think: Boolean, chatId: String?): String? {
-        return pipCoder
-            .prompt(Prompt(userInput))
-            .system("You are a very sarcastic software engineer ${if(think)"/think" else "/no_think"}")
-            .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId ?: NanoId.generate()) }
-            .call()
-            .content()
+    fun generate(codingRequestBody: CodingRequestBody): String? {
+        return with(codingRequestBody) {
+            pipCoder
+                .prompt(Prompt(input))
+                .system("You are a very sarcastic software engineer ${if(think)"/think" else "/no_think"}")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId ?: NanoId.generate()) }
+                .call()
+                .content()
+        }
     }
 
-    fun generateStream(userInput: String, think: Boolean, chatId: String?): Flux<String>? {
-        return pipCoder
-            .prompt(Prompt(userInput))
-            .system("You are a very sarcastic software engineer ${if(think)"/think" else "/no_think"}")
-            .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId ?: NanoId.generate()) }
-            .stream()
-            .content()
+    fun generateStream(codingRequestBody: CodingRequestBody): Flux<String>? {
+        return with(codingRequestBody) {
+            pipCoder
+                .prompt(Prompt(input))
+                .system("You are a very sarcastic software engineer ${if (think) "/think" else "/no_think"}")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId ?: NanoId.generate()) }
+                .stream()
+                .content()
+        }
     }
 }
