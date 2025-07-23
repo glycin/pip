@@ -42,7 +42,7 @@ intellijPlatform  {
     signing{}
 }
 
-private val ktorVersion = "2.3.12"
+private val ktorVersion = "3.2.2"
 private val logbackVersion = "1.5.18"
 
 dependencies {

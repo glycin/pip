@@ -1,4 +1,4 @@
-package com.glycin.pipp
+package com.glycin.pipp.utils
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction

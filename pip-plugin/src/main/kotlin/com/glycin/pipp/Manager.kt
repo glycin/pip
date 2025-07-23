@@ -3,11 +3,12 @@ package com.glycin.pipp
 import com.glycin.pipp.http.CodingRequestBody
 import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.prompts.CodingPrompts
+import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.NanoId
+import com.glycin.pipp.utils.TextWriter
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,11 +27,13 @@ class Manager(
     private val pip = Pip(Vec2(
         ((component?.width ?: 0) / 2).toFloat(),
         ((component?.height ?: 600) - 50).toFloat(),
-    ), 100, 100, scope)
+    ), 200, 200, scope)
     private val agentComponent: AgentComponent = AgentComponent(pip, scope, FPS).also {
         it.bounds = contentComponent?.bounds ?: Rectangle(1200, 800)
         it.isOpaque = false
     }
+
+    private val chatIds = mutableListOf(NanoId.generate())
 
     init {
         contentComponent?.let {
@@ -41,34 +44,50 @@ class Manager(
     }
 
     fun showInput() {
-        println("doing action")
-        val input = Messages.showInputDialog(
-            project,
-            "What don't you know this time?",
-            "Ask PIP",
-            Messages.getQuestionIcon(),
-        )
+        val dialog = PipInputDialog(project)
 
-        if(input != null) {
-            val context = getContext()
-            scope.launch(Dispatchers.IO) {
+        if(!dialog.showAndGet() || dialog.userInput.isEmpty() || editor == null) {
+            return
+        }
+
+        val context = getContext()
+        val chatId = if(dialog.newChat) NanoId.generate().also { chatIds.add(it) } else chatIds.last()
+
+        scope.launch(Dispatchers.IO) {
+            if(dialog.stream) {
+                val responseHandler = PipResponseHandler(editor, project)
+                TextWriter.deleteText(0, editor.document.textLength, editor, project)
+                PipRestClient.doCodeQuestionStream(
+                    codeRequest = CodingRequestBody(
+                        input = CodingPrompts.generateCodeRequestWithContext(dialog.userInput, context),
+                        think = dialog.think,
+                        chatId =  chatId
+                    )
+                ).collect { e -> responseHandler.processSse(e) }
+            } else {
                 val response = PipRestClient.doCodeQuestion(
                     codeRequest = CodingRequestBody(
-                        input = CodingPrompts.generateCodeRequestWithContext(input, context),
-                        think = false,
-                        chatId = NanoId.generate()
+                        input = CodingPrompts.generateCodeRequestWithContext(dialog.userInput, context),
+                        think = dialog.think,
+                        chatId =  chatId
                     )
                 )
 
-                TextWriter.replaceText(0, editor!!.document.textLength, response ?: "", editor, project)
+                TextWriter.replaceText(0, editor.document.textLength, response ?: "", editor, project)
             }
-        } else {
-            println("cancelled")
         }
     }
 
     override fun dispose() {
         agentComponent.dispose()
+    }
+
+    private fun processStreamingEvent(event: String) {
+        when(event) {
+            "<think>" -> { }
+            "</think>" -> { }
+            "```" -> {}
+        }
     }
 
     private fun getContext() : String {

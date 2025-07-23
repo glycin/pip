@@ -1,6 +1,5 @@
 package com.glycin.pipserver
 
-import com.glycin.pipserver.util.NanoId
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 

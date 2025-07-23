@@ -11,3 +11,5 @@ FINDINGS:
 System calls overwrite the default system
 
 the nano-id guy has the github.com/ai url 0o
+
+using ktor client is more trouble than it was worth (alot of config needed, and it seems to trim spaces from SSE)
