@@ -7,12 +7,18 @@ import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.Application
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
+import com.intellij.openapi.application.readAction
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.awt.Rectangle
+import java.awt.event.ComponentEvent
+import java.awt.event.ComponentListener
+import javax.swing.JComponent
 
 private const val FPS = 120L
 
@@ -22,24 +28,44 @@ class Manager(
 ): Disposable {
 
     private val editor = FileEditorManager.getInstance(project).selectedTextEditor
-    private val contentComponent = editor?.contentComponent
-    private val component = editor?.component
-    private val pip = Pip(Vec2(
-        ((component?.width ?: 0) / 2).toFloat(),
-        ((component?.height ?: 600) - 50).toFloat(),
-    ), 200, 200, scope)
+    private val contentComponent = editor?.contentComponent as JComponent
+    private val scrollModel = editor?.scrollingModel
+    private val pip = Pip(
+        position = Vec2.zero,
+        scope = scope
+    )
     private val agentComponent: AgentComponent = AgentComponent(pip, scope, FPS).also {
-        it.bounds = contentComponent?.bounds ?: Rectangle(1200, 800)
+        it.bounds = contentComponent.bounds
         it.isOpaque = false
     }
 
     private val chatIds = mutableListOf(NanoId.generate())
 
     init {
-        contentComponent?.let {
+        contentComponent.let {
             it.add(agentComponent)
             it.revalidate()
             it.repaint()
+            it.addComponentListener(object : ComponentListener {
+                override fun componentResized(e: ComponentEvent?) {
+                    agentComponent.bounds = it.bounds
+                }
+
+                override fun componentMoved(e: ComponentEvent?) {}
+                override fun componentShown(e: ComponentEvent?) {}
+                override fun componentHidden(e: ComponentEvent?) {}
+            })
+        }
+
+        scope.launch(Dispatchers.EDT) {
+            val visibleArea = scrollModel?.visibleArea!!
+            scrollModel.addVisibleAreaListener {
+                //TODO: Animate the movement
+                val newX = (it.newRectangle.width - pip.width - 5f) + it.newRectangle.x
+                val newY = (it.newRectangle.height - pip.height + 35f) + it.newRectangle.y
+                pip.position = Vec2(newX, newY)
+            }
+            pip.position = Vec2(visibleArea.width - pip.width - 5f, visibleArea.height - pip.height.toFloat() + 35)
         }
     }
 
@@ -55,7 +81,7 @@ class Manager(
 
         scope.launch(Dispatchers.IO) {
             if(dialog.stream) {
-                val responseHandler = PipResponseHandler(editor, project)
+                val responseHandler = PipResponseHandler(editor, project, pip)
                 TextWriter.deleteText(0, editor.document.textLength, editor, project)
                 PipRestClient.doCodeQuestionStream(
                     codeRequest = CodingRequestBody(

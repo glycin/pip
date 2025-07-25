@@ -6,10 +6,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.Graphics2D
 
+private const val DEFAULT_WIDTH = 200
+private const val DEFAULT_HEIGHT = 200
+
 class Pip(
     var position: Vec2,
-    val width: Int,
-    val height: Int,
+    val width: Int = DEFAULT_WIDTH,
+    val height: Int = DEFAULT_HEIGHT,
     private val scope: CoroutineScope,
 ) {
     private var state = PipState.SLEEPING
@@ -17,6 +20,7 @@ class Pip(
 
     fun changeStateTo(newState: PipState) {
         state = newState
+        println("NEW PIP STATE IS $state")
     }
 
     fun moveTo(newPosition: Vec2, duration: Long) {
@@ -52,4 +56,6 @@ enum class PipState {
     HANG_IDLE,
     WALL_SHOOTING,
     JUMPING,
+    THINKING,
+    TYPING
 }

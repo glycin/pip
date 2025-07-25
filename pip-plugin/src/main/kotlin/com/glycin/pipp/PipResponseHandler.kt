@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project
 class PipResponseHandler(
     private val editor: Editor,
     private val project: Project,
+    private val pip: Pip,
 ) {
     private var isThinking = false
     private var isCoding = false
@@ -16,8 +17,9 @@ class PipResponseHandler(
     fun processSse(event: String) {
         if(isCoding) {
 
-            if(line.trim().endsWith("``")) {
+            if(line.trim().endsWith("``") || line.trim().endsWith("```")) {
                 isCoding = false
+                pip.changeStateTo(PipState.IDLE)
             }
 
             if(event.containsNewLine()) {
@@ -33,9 +35,18 @@ class PipResponseHandler(
             val trimmed = line.trim()
             if(event.containsNewLine() || event == "<think>") {
                 when {
-                    trimmed == "<think>" || event == "<think>" -> isThinking = true
-                    trimmed == "</think>" || event == "</think>" -> isThinking = false
-                    trimmed.startsWith("```") -> isCoding = true
+                    trimmed == "<think>" || event == "<think>" ->  {
+                        isThinking = true
+                        pip.changeStateTo(PipState.THINKING)
+                    }
+                    trimmed == "</think>" || event == "</think>" -> {
+                        isThinking = false
+                        pip.changeStateTo(PipState.IDLE)
+                    }
+                    trimmed.startsWith("```") -> {
+                        isCoding = true
+                        pip.changeStateTo(PipState.TYPING)
+                    }
                 }
 
                 line = ""

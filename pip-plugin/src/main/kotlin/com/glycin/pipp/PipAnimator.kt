@@ -18,6 +18,9 @@ class PipAnimator {
     private val sleep = arrayOfNulls<BufferedImage>(8)
     private val walk = arrayOfNulls<BufferedImage>(8)
     private val wallIdle = arrayOfNulls<BufferedImage>(8)
+    private val thinking = arrayOfNulls<BufferedImage>(10)
+    private val typing = arrayOfNulls<BufferedImage>(8)
+    private val idleLick = arrayOfNulls<BufferedImage>(14)
 
     private var currentSprite : BufferedImage
     private var currentAnimationIndex = 0
@@ -52,12 +55,23 @@ class PipAnimator {
             wallIdle[index] = bufferedImage
         }
 
+        SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-thinking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 10).forEachIndexed { index, bufferedImage ->
+            thinking[index] = bufferedImage
+        }
+
+        SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-typing.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 8).forEachIndexed { index, bufferedImage ->
+            typing[index] = bufferedImage
+        }
+
+        SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-sitting-licking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 14).forEachIndexed { index, bufferedImage ->
+            idleLick[index] = bufferedImage
+        }
         currentSprite = sleep[0]!!
     }
 
     fun animate(g: Graphics2D, state: PipState, position: Vec2, width: Int, height: Int) {
         when(state) {
-            PipState.IDLE -> { }
+            PipState.IDLE -> showAnimation(idleLick)
             PipState.SLEEPING -> showAnimation(sleep)
             PipState.SITTING -> showAnimation(sit)
             PipState.WALKING -> showAnimation(walk)
@@ -65,6 +79,8 @@ class PipAnimator {
             PipState.HANG_IDLE -> showAnimation(wallIdle)
             PipState.WALL_SHOOTING -> showAnimation(wallBazooka)
             PipState.JUMPING -> showAnimation(jump)
+            PipState.THINKING -> showAnimation(thinking)
+            PipState.TYPING -> showAnimation(typing)
         }
 
         /*if(facing == Facing.LEFT) {
