@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.Graphics2D
+import kotlin.math.roundToInt
 
 private const val DEFAULT_WIDTH = 200
 private const val DEFAULT_HEIGHT = 200
@@ -42,8 +43,12 @@ class Pip(
         }
     }
 
+    fun update() {
+        animator.animate(state, position, width, height)
+    }
+
     fun render(g: Graphics2D) {
-        animator.animate(g, state, position, width, height)
+        g.drawImage(animator.getCurrentSprite(), position.x.roundToInt(), position.y.roundToInt(), width, height, null)
     }
 }
 

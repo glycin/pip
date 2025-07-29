@@ -30,12 +30,7 @@ class PipResponseHandler(
             TextWriter.writeText(0, codeBody, editor, project)
             delay(1000)
             pip.changeStateTo(PipState.SITTING)
+            agentComponent.showSpeechBubble(cleaned)
         }
-    }
-
-    private val createSpeechBubble() {
-        agentComponent.add(
-
-        )
     }
 }
