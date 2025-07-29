@@ -7,10 +7,7 @@ import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.Application
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
-import com.intellij.openapi.application.readAction
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import kotlinx.coroutines.CoroutineScope
@@ -60,7 +57,7 @@ class Manager(
         scope.launch(Dispatchers.EDT) {
             val visibleArea = scrollModel?.visibleArea!!
             scrollModel.addVisibleAreaListener {
-                //TODO: Animate the movement
+                //TODO: Animate the movement when screen resizes
                 val newX = (it.newRectangle.width - pip.width - 5f) + it.newRectangle.x
                 val newY = (it.newRectangle.height - pip.height + 35f) + it.newRectangle.y
                 pip.position = Vec2(newX, newY)
@@ -81,7 +78,7 @@ class Manager(
 
         scope.launch(Dispatchers.IO) {
             if(dialog.stream) {
-                val responseHandler = PipResponseHandler(editor, project, pip)
+                val responseHandler = PipStreamResponseHandler(editor, project, pip)
                 TextWriter.deleteText(0, editor.document.textLength, editor, project)
                 PipRestClient.doCodeQuestionStream(
                     codeRequest = CodingRequestBody(
@@ -91,29 +88,23 @@ class Manager(
                     )
                 ).collect { e -> responseHandler.processSse(e) }
             } else {
-                val response = PipRestClient.doCodeQuestion(
+                val responseHandler = PipResponseHandler(editor, project, scope, pip, agentComponent)
+                pip.changeStateTo(PipState.THINKING)
+                PipRestClient.doCodeQuestion(
                     codeRequest = CodingRequestBody(
                         input = CodingPrompts.generateCodeRequestWithContext(dialog.userInput, context),
                         think = dialog.think,
                         chatId =  chatId
                     )
-                )
-
-                TextWriter.replaceText(0, editor.document.textLength, response ?: "", editor, project)
+                )?.also {
+                    responseHandler.processResponse(it)
+                }
             }
         }
     }
 
     override fun dispose() {
         agentComponent.dispose()
-    }
-
-    private fun processStreamingEvent(event: String) {
-        when(event) {
-            "<think>" -> { }
-            "</think>" -> { }
-            "```" -> {}
-        }
     }
 
     private fun getContext() : String {

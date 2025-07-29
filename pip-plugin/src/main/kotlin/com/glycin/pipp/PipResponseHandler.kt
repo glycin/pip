@@ -1,77 +1,41 @@
 package com.glycin.pipp
 
+import com.glycin.pipp.utils.Extensions.getAndRemoveBetween
+import com.glycin.pipp.utils.Extensions.getAndRemoveCodeBlock
 import com.glycin.pipp.utils.TextWriter
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class PipResponseHandler(
     private val editor: Editor,
     private val project: Project,
+    private val scope: CoroutineScope,
     private val pip: Pip,
+    private val agentComponent: AgentComponent,
 ) {
-    private var isThinking = false
-    private var isCoding = false
 
-    private var line = ""
+    fun processResponse(response: String) {
+        val (thinkBody, remaining) = response.getAndRemoveBetween("<think>", "</think>")
+        val (codeBody, cleaned) = remaining.getAndRemoveCodeBlock()
 
-    fun processSse(event: String) {
-        if(isCoding) {
-
-            if(line.trim().endsWith("``") || line.trim().endsWith("```")) {
-                isCoding = false
-                pip.changeStateTo(PipState.IDLE)
-            }
-
-            if(event.containsNewLine()) {
-                line += event
-                addToEditor(line)
-                line = ""
-            } else {
-                line += event
-            }
-
-        } else {
-            line += event
-            val trimmed = line.trim()
-            if(event.containsNewLine() || event == "<think>") {
-                when {
-                    trimmed == "<think>" || event == "<think>" ->  {
-                        isThinking = true
-                        pip.changeStateTo(PipState.THINKING)
-                    }
-                    trimmed == "</think>" || event == "</think>" -> {
-                        isThinking = false
-                        pip.changeStateTo(PipState.IDLE)
-                    }
-                    trimmed.startsWith("```") -> {
-                        isCoding = true
-                        pip.changeStateTo(PipState.TYPING)
-                    }
-                }
-
-                line = ""
-            }
-
-            when {
-                isThinking -> addToThinking(event)
-                else -> addToPipText(event)
-            }
+        scope.launch(Dispatchers.EDT) {
+            TextWriter.deleteText(0, editor.document.textLength, editor, project)
+            pip.changeStateTo(PipState.TYPING)
+            delay(5000)
+            TextWriter.writeText(0, codeBody, editor, project)
+            delay(1000)
+            pip.changeStateTo(PipState.SITTING)
         }
     }
 
-    private fun addToThinking(event: String) {
-        println("PIP IS THINKING => $event")
-    }
+    private val createSpeechBubble() {
+        agentComponent.add(
 
-    private fun addToPipText(event: String) {
-        println("PIP IS TYPING => $event")
+        )
     }
-
-    private fun addToEditor(event: String) {
-        if(event.contains('`')) { return }
-        val startOffset = editor.document.textLength
-        TextWriter.writeText(startOffset, event, editor, project)
-    }
-
-    private fun String.containsNewLine() = contains("\n") || contains("\r\n") || contains("\r")
 }

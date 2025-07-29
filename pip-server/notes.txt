@@ -13,3 +13,7 @@ System calls overwrite the default system
 the nano-id guy has the github.com/ai url 0o
 
 using ktor client is more trouble than it was worth (alot of config needed, and it seems to trim spaces from SSE)
+
+I started with streaming endpoints, but i found myself waiting for the complete answer anyway so simplified to non streaming
+
+LLMs kinda break when u ask them to do things with backticks (`)

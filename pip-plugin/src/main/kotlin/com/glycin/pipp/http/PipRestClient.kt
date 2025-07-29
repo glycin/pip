@@ -36,10 +36,7 @@ object PipRestClient {
         }
 
         engine {
-            endpoint {
-                keepAliveTime = 60000
-                connectTimeout = 60000
-            }
+            requestTimeout = 60_000
         }
     }
 
