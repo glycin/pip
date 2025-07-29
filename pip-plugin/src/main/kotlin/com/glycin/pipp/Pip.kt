@@ -44,7 +44,7 @@ class Pip(
     }
 
     fun update() {
-        animator.animate(state, position, width, height)
+        animator.animate(state)
     }
 
     fun render(g: Graphics2D) {

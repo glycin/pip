@@ -26,11 +26,11 @@ class PipResponseHandler(
         scope.launch(Dispatchers.EDT) {
             TextWriter.deleteText(0, editor.document.textLength, editor, project)
             pip.changeStateTo(PipState.TYPING)
-            delay(5000)
+            delay(1500)
             TextWriter.writeText(0, codeBody, editor, project)
             delay(1000)
             pip.changeStateTo(PipState.SITTING)
-            agentComponent.showSpeechBubble(cleaned)
+            agentComponent.showSpeechBubble(cleaned.trim())
         }
     }
 }

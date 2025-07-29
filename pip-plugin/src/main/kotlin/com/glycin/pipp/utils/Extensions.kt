@@ -1,5 +1,8 @@
 package com.glycin.pipp.utils
 
+import com.intellij.ui.JBColor
+import java.awt.Color
+
 object Extensions {
 
     fun String.getBetween(start: String, end: String): String {
@@ -30,4 +33,6 @@ object Extensions {
         }
         return found.toString() to replaced
     }
+
+    fun Color.toJbColor() = JBColor(this, this)
 }

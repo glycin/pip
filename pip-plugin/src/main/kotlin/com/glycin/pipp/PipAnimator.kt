@@ -30,7 +30,7 @@ class PipAnimator {
         currentSprite = sleep[0]
     }
 
-    fun animate(state: PipState, position: Vec2, width: Int, height: Int) {
+    fun animate(state: PipState) {
         when(state) {
             PipState.IDLE -> showAnimation(idleLick)
             PipState.SLEEPING -> showAnimation(sleep)

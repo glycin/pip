@@ -15,8 +15,8 @@ import kotlin.math.roundToInt
 
 class AgentComponent(
     private val pip: Pip,
-    scope: CoroutineScope,
-    fps : Long,
+    private val scope: CoroutineScope,
+    private val fps : Long,
 ): JComponent(), Disposable {
 
     private val deltaTime = 1000L / fps
@@ -43,7 +43,7 @@ class AgentComponent(
 
     override fun dispose() {
         active = false
-        speechBubble?.stopTypewriter()
+        speechBubble?.deactivate()
         speechBubble?.let {
             hideSpeechBubble()
         }
@@ -52,16 +52,19 @@ class AgentComponent(
     fun showSpeechBubble(message: String) {
         speechBubble?.let { remove(it) }
 
-        speechBubble = PipSpeechBubble(message).apply {
-            setBounds(50, 20, 250, 100) // Position the bubble
-        }
-
+        val bubblePos = pip.position + (Vec2.up * 10f)
+        speechBubble = PipSpeechBubble(
+            fullText = message,
+            pos = bubblePos,
+            scope = scope,
+            fps = fps
+        )
         add(speechBubble)
         revalidate()
         repaint()
     }
 
-    fun hideSpeechBubble() {
+    private fun hideSpeechBubble() {
         speechBubble?.let {
             remove(it)
             speechBubble = null
