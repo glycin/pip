@@ -1,22 +1,21 @@
 package com.glycin.pipp.ui
 
+import com.glycin.pipp.Pip
 import com.glycin.pipp.Vec2
 import com.glycin.pipp.utils.Extensions.toJbColor
+import com.glycin.pipp.utils.Fonts
 import com.glycin.pipp.utils.SpriteSheetImageLoader
 import com.intellij.openapi.application.EDT
-import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBScrollPane
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.Color
-import java.awt.Dimension
+import java.awt.Font
 import java.awt.Graphics
 import java.awt.Graphics2D
-import java.awt.image.BufferedImage
 import javax.swing.JComponent
-import javax.swing.JScrollPane
 import javax.swing.JTextPane
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
@@ -24,11 +23,14 @@ import kotlin.math.roundToInt
 
 private const val BASE_PATH = "/art/spritesheets"
 
+private const val SCROLL_X_PADDING = 5
+private const val SCROLL_Y_PADDING = 3
+private const val SCROLL_BOTTOM_PADDING = 35
 class PipSpeechBubble(
-    private val width: Int = 192,
-    private val height: Int = 96,
+    private val width: Int = 256,
+    private val height: Int = 128,
+    private val pip: Pip,
     fullText: String,
-    pos: Vec2,
     scope: CoroutineScope,
     fps: Long,
 ): JComponent() {
@@ -38,10 +40,11 @@ class PipSpeechBubble(
     private val scrollPane: BubbleScrollPane
 
     init {
+        val pos = pip.position + (Vec2.up * 50f) + (Vec2.left * 50f)
         setBounds(pos.x.roundToInt(), pos.y.roundToInt(), width, height)
 
-        scrollPane = BubbleScrollPane(fullText, width, height, scope, deltaTime).apply {
-            setBounds(0, 0, width, height)
+        scrollPane = BubbleScrollPane(fullText, scope, deltaTime).apply {
+            setBounds(SCROLL_X_PADDING, SCROLL_Y_PADDING, width - SCROLL_X_PADDING, height - SCROLL_BOTTOM_PADDING)
         }
 
         add(scrollPane)
@@ -60,6 +63,9 @@ class PipSpeechBubble(
 
     override fun paintComponent(g: Graphics?) {
         super.paintComponent(g)
+        val pos = pip.position + (Vec2.up * 50f) + (Vec2.left * 50f)
+        setBounds(pos.x.roundToInt(), pos.y.roundToInt(), width, height)
+        scrollPane.setBounds(SCROLL_X_PADDING, SCROLL_Y_PADDING, width - SCROLL_X_PADDING, height - SCROLL_BOTTOM_PADDING)
         if(g is Graphics2D) {
             g.drawImage(BUBBLE, 0, 0, width, height, null)
         }
@@ -78,8 +84,6 @@ class PipSpeechBubble(
 
 private class BubbleScrollPane(
     private val fullText: String,
-    width: Int,
-    height: Int,
     scope: CoroutineScope,
     deltaTime: Long,
 ): JBScrollPane() {
@@ -91,27 +95,27 @@ private class BubbleScrollPane(
         isEditable = false
         foreground = color
         val doc = styledDocument
+        val font = Fonts.pixelFont
         val style = SimpleAttributeSet().apply {
-            StyleConstants.setFontFamily(this, "Dialog")
-            StyleConstants.setFontSize(this, 12)
-            StyleConstants.setForeground(this, color)
+            StyleConstants.setFontFamily(inputAttributes, font.family)
+            StyleConstants.setFontSize(inputAttributes, 10)
+            StyleConstants.setItalic(inputAttributes, (font.style and Font.ITALIC) != 0)
+            StyleConstants.setBold(inputAttributes, (font.style and Font.BOLD) != 0)
+            StyleConstants.setForeground(inputAttributes, color)
         }
 
         doc.setCharacterAttributes(0, doc.length, style, false)
     }
 
     init {
-        setBounds(0, 0, width, height)
-
         isOpaque = false
         viewport.isOpaque = false
         textPane.isOpaque = false
-        textPane.background = Color(0,0,0,0).toJbColor()
+        textPane.background = PipColors.transparent
 
         setViewportView(textPane)
         verticalScrollBarPolicy = VERTICAL_SCROLLBAR_AS_NEEDED
         horizontalScrollBarPolicy = HORIZONTAL_SCROLLBAR_NEVER
-        preferredSize = Dimension(width, height)
 
         active = true
         scope.launch (Dispatchers.EDT) {
