@@ -17,3 +17,5 @@ using ktor client is more trouble than it was worth (alot of config needed, and 
 I started with streaming endpoints, but i found myself waiting for the complete answer anyway so simplified to non streaming
 
 LLMs kinda break when u ask them to do things with backticks (`)
+
+fine tuning the model turned to be more destructive than i wanted.

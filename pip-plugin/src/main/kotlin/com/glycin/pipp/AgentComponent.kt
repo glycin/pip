@@ -3,7 +3,6 @@ package com.glycin.pipp
 import com.glycin.pipp.ui.PipColors
 import com.glycin.pipp.ui.PipSpeechBubble
 import com.glycin.pipp.utils.Fonts
-import com.intellij.icons.AllIcons.Icons
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.ui.JBColor
