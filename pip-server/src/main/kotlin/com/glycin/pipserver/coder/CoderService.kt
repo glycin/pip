@@ -35,7 +35,7 @@ class CoderService(
         return with(codingRequestBody) {
             pipCoder
                 .prompt(Prompt(input))
-                .system("You are a very sarcastic software engineer. If you need to write code, always answer with the full code snippet and don't cut corners. ${if(think)"/think" else "/no_think"}")
+                .system("${Prompts.CODER_SYSTEM_PROMPT} ${if(think)"/think" else "/no_think"}")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId ?: NanoId.generate()) }
                 .call()
                 .content()
@@ -46,7 +46,7 @@ class CoderService(
         return with(codingRequestBody) {
             pipCoder
                 .prompt(Prompt(input))
-                .system("You are a very sarcastic software engineer. If you need to write code, always answer with the full code snippet and don't cut corners. ${if (think) "/think" else "/no_think"}")
+                .system("${Prompts.CODER_SYSTEM_PROMPT} ${if (think) "/think" else "/no_think"}")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId ?: NanoId.generate()) }
                 .stream()
                 .content()

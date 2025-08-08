@@ -3,7 +3,8 @@ QWEN 3 thinking mode on "blabla bla text /think"
 
 QWEN 3 thinking mode off "blabla bla text /no_think"
 
-
+Embedding model -> https://huggingface.co/jinaai/jina-embeddings-v4 (maybe?)
+MUVERA? (https://research.google/blog/muvera-making-multi-vector-retrieval-as-fast-as-single-vector-search/)
 TODO:
 Add grafana dashboarding using spring ai observability? https://docs.spring.io/spring-ai/reference/observability/index.html
 
@@ -19,3 +20,10 @@ I started with streaming endpoints, but i found myself waiting for the complete 
 LLMs kinda break when u ask them to do things with backticks (`)
 
 fine tuning the model turned to be more destructive than i wanted.
+
+GraalPy + ML packages + windows = bad time
+
+
+THINGS TO EXPLAIN:
+NO INTERACTION EMBEDDINGS VS FULL INTERACTION VS NO INTERACTION
+SINGLE VECTOR VS MULTI VECTOR EMBEDDINGS

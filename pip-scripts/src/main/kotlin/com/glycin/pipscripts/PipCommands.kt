@@ -1,6 +1,7 @@
 package com.glycin.pipscripts
 
 import com.glycin.pipscripts.slack.SlackParser
+import com.glycin.pipscripts.vectorization.Vectorizer
 import org.springframework.shell.standard.ShellComponent
 import org.springframework.shell.standard.ShellMethod
 import org.springframework.shell.standard.ShellOption
@@ -20,6 +21,19 @@ class PipCommands {
             "Parsed slack messages from folder: ${folder.absolutePath} and exported them to:"
         } else {
             "Path is not a directory (${folder.absolutePath}"
+        }
+    }
+
+    @ShellMethod(key = ["embed"])
+    fun embed(
+        @ShellOption(help = "What kind of file are you vectorizing? Options: Text, Image, PDF") fileType: String,
+    ) : String {
+        val vectorizer = Vectorizer()
+        return when(fileType.lowercase()) {
+            "text" -> vectorizer.parseText()
+            "image" -> "Image not supported yet."
+            "pdf" -> "PDF not supported yet."
+            else -> "Can't parse $fileType"
         }
     }
 }

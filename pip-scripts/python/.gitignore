@@ -1,0 +1,6 @@
+embeddingModules/__pycache__
+embeddingModules/Include
+embeddingModules/Lib
+embeddingModules/Scripts
+embeddingModules/share
+embeddingModules/pyvenv.cfg

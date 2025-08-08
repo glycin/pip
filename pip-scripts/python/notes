@@ -1,0 +1,2 @@
+ .\Scripts\activate (to activate python venv)
+ fastapi dev .\embeddingServer.py (start the server)
