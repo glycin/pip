@@ -1,0 +1,18 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.15
+    container_name: pip-qdrant
+    ports:
+      - "6333:6333" #REST API
+      - "6334:6334" #gRPC API
+    expose:
+      - 6333
+      - 6334
+      - 6335
+    volumes:
+      - C:\Projects\pip-storage\qdrant:/qdrant/storage
+
+configs:
+  qdrant_config:
+    content: |
+      log_level: INFO
