@@ -16,10 +16,8 @@ import io.qdrant.client.VectorFactory.vector
 import io.qdrant.client.VectorsFactory.namedVectors
 import io.qdrant.client.grpc.JsonWithInt
 import io.qdrant.client.grpc.Points
-import io.qdrant.client.grpc.Points.PointId
 import io.qdrant.client.grpc.Points.PointStruct
 import io.qdrant.client.grpc.Points.ReadConsistency
-import io.qdrant.client.grpc.Points.RetrievedPoint
 import org.springframework.stereotype.Service
 import java.util.*
 
