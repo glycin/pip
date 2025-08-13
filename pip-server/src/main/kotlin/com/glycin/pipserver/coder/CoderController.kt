@@ -1,5 +1,6 @@
 package com.glycin.pipserver.coder
 
+import com.glycin.pipserver.shared.PipRequestBody
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -15,7 +16,7 @@ class CoderController(
 ){
     @PostMapping("/generate")
     fun generate(
-        @RequestBody codingRequest: CodingRequestBody,
+        @RequestBody codingRequest: PipRequestBody,
     ): ResponseEntity<String> {
         val response = coderService.generate(codingRequest)
         return if(response.isNullOrEmpty())
@@ -26,7 +27,7 @@ class CoderController(
 
     @PostMapping("/generate/stream", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun generateStream(
-        @RequestBody codingRequest: CodingRequestBody,
+        @RequestBody codingRequest: PipRequestBody,
     ): ResponseEntity<Flow<String>> {
         val response = coderService.generateStream(codingRequest)
         return ResponseEntity.ok().body(response)

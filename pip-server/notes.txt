@@ -23,6 +23,9 @@ fine tuning the model turned to be more destructive than i wanted.
 
 GraalPy + ML packages + windows = bad time
 
+"org.openrewrite.config.RecipeIntrospectionException: Kotlin recipes must be instantiated using Jackson ?!?!?!?!?!?
+
+OLLAMA chat client can't handle <think></think> tags for structured output :(
 
 THINGS TO EXPLAIN:
 NO INTERACTION EMBEDDINGS VS FULL INTERACTION VS NO INTERACTION

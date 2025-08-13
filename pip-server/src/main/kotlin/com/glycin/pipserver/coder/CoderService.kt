@@ -1,8 +1,7 @@
 package com.glycin.pipserver.coder
 
-import com.glycin.pipserver.qdrant.EmbeddingRequest
-import com.glycin.pipserver.qdrant.EmbeddingService
 import com.glycin.pipserver.qdrant.QdrantService
+import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.util.NanoId
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.channels.awaitClose
@@ -33,25 +32,25 @@ class CoderService(
         )
         .build()
 
-    fun generate(codingRequestBody: CodingRequestBody): String? {
-        val additionalContext = qdrantService.search(codingRequestBody.input, "Riccardo").joinToString { it.text }
+    fun generate(pipRequestBody: PipRequestBody): String? {
+        val additionalContext = qdrantService.search(pipRequestBody.input, "Riccardo").joinToString { it.text }
         LOG.info { additionalContext }
-        return with(codingRequestBody) {
+        return with(pipRequestBody) {
             pipCoder
                 .prompt(Prompt("$input. Here some additional context that riccardo has said relevant to this matter $additionalContext"))
-                .system("${Prompts.CODER_SYSTEM_PROMPT} ${if(think)"/think" else "/no_think"}")
-                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId ?: NanoId.generate()) }
+                .system("${CoderPrompts.CODER_SYSTEM_PROMPT} ${if(think)"/think" else "/no_think"}")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
                 .call()
                 .content()
         }
     }
 
-    fun generateStream(codingRequestBody: CodingRequestBody): Flow<String> {
-        return with(codingRequestBody) {
+    fun generateStream(pipRequestBody: PipRequestBody): Flow<String> {
+        return with(pipRequestBody) {
             pipCoder
                 .prompt(Prompt(input))
-                .system("${Prompts.CODER_SYSTEM_PROMPT} ${if (think) "/think" else "/no_think"}")
-                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId ?: NanoId.generate()) }
+                .system("${CoderPrompts.CODER_SYSTEM_PROMPT} ${if (think) "/think" else "/no_think"}")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
                 .stream()
                 .content()
                 .chatFlow("Finished chatting")

@@ -1,8 +1,7 @@
 package com.glycin.pipserver.qdrant
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType
 import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
@@ -10,11 +9,9 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 
 @Service
-class EmbeddingService {
-
-    private val objectMapper = ObjectMapper().registerKotlinModule().apply {
-        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true)
-    }
+class EmbeddingService(
+    @Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
+) {
 
     private val client = RestClient.builder()
         .baseUrl("http://localhost:8000")

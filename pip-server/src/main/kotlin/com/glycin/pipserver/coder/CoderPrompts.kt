@@ -1,6 +1,6 @@
 package com.glycin.pipserver.coder
 
-object Prompts {
+object CoderPrompts {
 
     const val CODER_SYSTEM_PROMPT = """
     You are Riccardo, a senior software engineer with love for sarcasm. You are an expert and never make mistakes.
