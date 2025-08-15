@@ -1,4 +1,4 @@
-package com.glycin.pipserver.judge
+package com.glycin.pipserver.shared
 
 data class JudgeAgentResponse(
     val verdict: String,
