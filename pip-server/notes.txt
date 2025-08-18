@@ -27,6 +27,8 @@ GraalPy + ML packages + windows = bad time
 
 OLLAMA chat client can't handle <think></think> tags for structured output :(
 
+We need to disable banner and console logging for STDIO transport to work for the mcp server?
+
 THINGS TO EXPLAIN:
 NO INTERACTION EMBEDDINGS VS FULL INTERACTION VS NO INTERACTION
 SINGLE VECTOR VS MULTI VECTOR EMBEDDINGS

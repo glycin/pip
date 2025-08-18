@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "target/mcpip-1.0.0.jar"
+      ]
+    }
+  }
+}

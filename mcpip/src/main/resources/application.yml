@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: mcpip
+  main:
+    banner-mode: off
+    web-application-type: none
+  ai:
+    mcp:
+      server:
+        name: mcpip
+        version: 1.0.0
+        type: SYNC
+        capabilities:
+          completion: false
+          prompt: false
+        enabled: true
+
+logging:
+  pattern:
+    console:
+  file:
+    name: C:\Users\lorda\Desktop\Pip\mcp.log

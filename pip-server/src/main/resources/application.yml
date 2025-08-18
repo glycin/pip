@@ -8,6 +8,13 @@ spring:
       chat:
         options:
           model: qwen3:8b
+    mcp:
+      client:
+        enabled: true
+        toolcallback:
+          enabled: true
+        stdio:
+          servers-configuration: classpath:mcp-servers.json
 
 logging:
   level:

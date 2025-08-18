@@ -26,6 +26,7 @@ val grpcVersion = "1.65.1"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.ai:spring-ai-starter-model-ollama")
+    implementation("org.springframework.ai:spring-ai-starter-mcp-client")
 
     //kotlin
     implementation("io.github.oshai:kotlin-logging-jvm:$kotlinLoggingVersion")
