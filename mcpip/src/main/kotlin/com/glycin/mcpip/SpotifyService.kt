@@ -3,6 +3,7 @@ package com.glycin.mcpip
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.neovisionaries.i18n.CountryCode
+import org.slf4j.LoggerFactory
 import org.springframework.ai.tool.annotation.Tool
 import org.springframework.ai.tool.annotation.ToolParam
 import org.springframework.stereotype.Service
@@ -16,6 +17,7 @@ private const val PLAYLIST_ID = "spotify:playlist:4agDUCts2VBH5yBr20YUSB"
 class SpotifyService(
     spotifyProperties: SpotifyProperties,
 ) {
+    private val log = LoggerFactory.getLogger(SpotifyService::class.java)
 
     private val spotifyApi = SpotifyApi.builder()
         .setClientId(spotifyProperties.clientId)
@@ -44,11 +46,12 @@ class SpotifyService(
         println(authCodeRequest.refreshToken)
          */
     }
-    
+
     @Tool(description = "Play a song. Input is the name of the song")
     fun playSong(
         @ToolParam(description = "The name of the song to be played") songName: String,
     ): String {
+        log.info("PLAY SONG TOOL INVOKED => Trying to find song: $songName")
         val devices = spotifyApi.usersAvailableDevices.build().execute()
         return devices.takeIf { !it.isNullOrEmpty() }
             ?.first()
@@ -65,6 +68,7 @@ class SpotifyService(
                 tracks.takeIf { it.isNotEmpty() }
                     ?.first()
                     ?.let { track ->
+                        log.info("Found a song to play ${track.name}")
                         spotifyApi.startResumeUsersPlayback()
                             .device_id(devices.first().id)
                             .uris(JsonParser.parseString("[\"${track.uri}\"]").asJsonArray)
@@ -77,9 +81,10 @@ class SpotifyService(
 
     @Tool(description = "Start playing from the metal playlist")
     fun playFromMetal(): String {
+        log.info("PLAY METAL PLAYLIST TOOL INVOKED")
         val randomOffset = Random.nextInt(0, 300)
         val devices = spotifyApi.usersAvailableDevices.build().execute()
-        devices.takeIf { !it.isNullOrEmpty() }
+        return devices.takeIf { !it.isNullOrEmpty() }
             ?.first()
             ?.let {
                 val offsetObj = JsonObject()
@@ -89,7 +94,7 @@ class SpotifyService(
                     .offset(offsetObj)
                     .build()
                     .execute()
-            } ?: return "Could not play music. Something went wrong."
-        return "Music is now playing from the metal playlist."
+                "Music is now playing from the metal playlist."
+            } ?: "Could not play music. Something went wrong."
     }
 }

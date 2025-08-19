@@ -14,7 +14,17 @@ spring:
         toolcallback:
           enabled: true
         stdio:
-          servers-configuration: classpath:mcp-servers.json
+          connections:
+            mcpip:
+              command: java
+              args:
+                - -jar
+                - target/mcpip-1.0.0.jar
+              env:
+                SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
+                SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
+                SPOTIFY_REFRESH_TOKEN: ${SPOTIFY_REFRESH_TOKEN}
+#          servers-configuration: classpath:mcp-servers-example.json
 
 logging:
   level:

@@ -1,5 +1,6 @@
 package com.glycin.mcpip
 
+import org.slf4j.LoggerFactory
 import org.springframework.ai.tool.annotation.Tool
 import org.springframework.ai.tool.annotation.ToolParam
 import org.springframework.stereotype.Service
@@ -12,9 +13,11 @@ import kotlin.io.path.pathString
 
 @Service
 class FileSystemService {
+    private val log = LoggerFactory.getLogger(FileSystemService::class.java)
 
     @Tool(description = "Get the information at a given directory path. Input is the absolute path to the directory.")
     fun getDirectoryInformation(@ToolParam(description = "The absolute path to the directory") input: String): String {
+        log.info("GET DIRECTORY INFO TOOL INVOKED => directory path is $input")
         val absPath = Path.of(input)
         return try {
             val basicAttrs = Files.readAttributes(absPath, BasicFileAttributes::class.java)

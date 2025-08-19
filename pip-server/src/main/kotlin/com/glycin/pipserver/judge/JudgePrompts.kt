@@ -26,8 +26,13 @@ object JudgePrompts {
 
     val CATEGORIZATION_JUDGE = """
         You are a categorization agent. Your goal is to categorize the user query into one of the following categories:
-        JUST_CHATTING, CODING, GAMES, MUSIC.
-        If not sure where to place it, add it under JUST_CHATTING.
+        JUST_CHATTING, CODING, GAMES, MUSIC, BUTLER.
+        If the user is asking random questions, categorize it as JUST_CHATTING.
+        If the user is asking you to do simple tasks like create files or summarize text, categorize it as BUTLER. 
+        If the user asks you questions about code, provides code in the context or wants you to generate code, categorize it as CODING.
+        If the user asks you to play any type of game with them, categorize it as GAMES.
+        If the user asks to play music, or a playlist categorize it as MUSIC.
+        If not sure where to place it, categorize it as JUST_CHATTING.
         IMPORTANT: Only provide a RFC8259 compliant JSON response following this format without deviation:
         {
           "category": "The category here",

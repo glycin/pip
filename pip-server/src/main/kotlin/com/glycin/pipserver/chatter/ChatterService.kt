@@ -12,7 +12,22 @@ class ChatterService(
     private val pipChatter: ChatClient,
 ) {
 
-    fun chat(request: PipRequestBody, judgment: JudgeAgentResponse): ChatterResponse? {
+    fun judgmentalChat(request: PipRequestBody, judgment: JudgeAgentResponse): ChatterResponse? {
+        return with(request) {
+            pipChatter
+                .prompt(Prompt("""
+                    $input
+                    The categorization agent had the following judgement: ${judgment.verdict}, because ${judgment.reason}
+                """.trimIndent()))
+                .system("${ChatterPrompts.CHATTER_GENERIC_PROMPT} ${if(think)"/think" else "/no_think"}")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
+                .call()
+                .content()
+                ?.let { ChatterResponse(it) }
+        }
+    }
+
+    fun chat(request: PipRequestBody): ChatterResponse? {
         return with(request) {
             pipChatter
                 .prompt(Prompt("""

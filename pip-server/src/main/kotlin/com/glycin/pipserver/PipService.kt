@@ -24,7 +24,7 @@ class PipService(
                 "CODING" -> codingRequest(request)
                 "JUST_CHATTING" -> chattingRequest(request)
                 "GAMES" -> "NOT YET SUPPORTED"
-                "MUSIC" -> "NOT YET SUPPORTED"
+                "MUSIC" -> musicRequest(request)
                 else -> "UNKNOWN CATEGORY"
             }
         } ?: return null
@@ -52,11 +52,15 @@ class PipService(
         } ?: return FAIL_RESPONSE
     }
 
-    private fun chattingRequest(request: PipRequestBody): String? {
+    private fun chattingRequest(request: PipRequestBody): String {
         val judgment = judgeService.judge(request)
         return judgment?.let {
             LOG.info { "Judge Dredd says: chat request is ${judgment.verdict} because ${judgment.reason}" }
-            chatService.chat(request, judgment)?.response
+            chatService.judgmentalChat(request, judgment)?.response
         } ?: FAIL_RESPONSE
+    }
+
+    private fun musicRequest(request: PipRequestBody): String {
+        return chatService.chat(request)?.response ?: FAIL_RESPONSE
     }
 }
