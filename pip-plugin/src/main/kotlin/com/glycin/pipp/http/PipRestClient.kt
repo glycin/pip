@@ -40,7 +40,18 @@ object PipRestClient {
         }
     }
 
-    suspend fun doCodeQuestion(codeRequest: CodingRequestBody): String? {
+    suspend fun doQuestion(pipRequestBody: PipRequestBody): String? {
+        val response = client.post("$baseUrl/pip/help") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(pipRequestBody)
+        }
+
+        return if(response.status == HttpStatusCode.OK) response.bodyAsText()
+        else null
+    }
+
+    suspend fun doCodeQuestion(codeRequest: PipRequestBody): String? {
         val response = client.post("$baseUrl/code/generate") {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
@@ -51,10 +62,10 @@ object PipRestClient {
         else null
     }
 
-    fun doCodeQuestionStream(codeRequest: CodingRequestBody): Flow<String> = callbackFlow {
+    fun doCodeQuestionStream(pipRequest: PipRequestBody): Flow<String> = callbackFlow {
         client.sse(urlString = "$baseUrl/code/generate/stream", request = {
             method = HttpMethod.Post
-            setBody(codeRequest)
+            setBody(pipRequest)
             contentType(ContentType.Application.Json)
         }) {
             incoming.collect { event ->

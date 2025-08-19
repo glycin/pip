@@ -1,6 +1,6 @@
 package com.glycin.pipp
 
-import com.glycin.pipp.http.CodingRequestBody
+import com.glycin.pipp.http.PipRequestBody
 import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.ui.PipInputDialog
@@ -81,7 +81,7 @@ class Manager(
                 val responseHandler = PipStreamResponseHandler(editor, project, pip)
                 TextWriter.deleteText(0, editor.document.textLength, editor, project)
                 PipRestClient.doCodeQuestionStream(
-                    codeRequest = CodingRequestBody(
+                    pipRequest = PipRequestBody(
                         input = CodingPrompts.generateCodeRequestWithContext(dialog.userInput, context),
                         think = dialog.think,
                         chatId =  chatId
@@ -90,8 +90,8 @@ class Manager(
             } else {
                 val responseHandler = PipResponseHandler(editor, project, scope, pip, agentComponent)
                 pip.changeStateTo(PipState.THINKING)
-                PipRestClient.doCodeQuestion(
-                    codeRequest = CodingRequestBody(
+                PipRestClient.doQuestion(
+                    pipRequestBody = PipRequestBody(
                         input = CodingPrompts.generateCodeRequestWithContext(dialog.userInput, context),
                         think = dialog.think,
                         chatId =  chatId
