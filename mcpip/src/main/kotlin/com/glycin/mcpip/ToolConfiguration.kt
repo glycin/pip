@@ -15,4 +15,12 @@ class ToolConfiguration {
             .toolObjects(fileSystemService)
             .build();
     }
+
+    @Bean
+    fun spotifyTools(spotifyService: SpotifyService): ToolCallbackProvider {
+        return MethodToolCallbackProvider
+            .builder()
+            .toolObjects(spotifyService)
+            .build()
+    }
 }

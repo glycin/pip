@@ -20,3 +20,9 @@ logging:
     console:
   file:
     name: C:\Users\lorda\Desktop\Pip\mcp.log
+
+spotify:
+  client-id: ${SPOTIFY_CLIENT_ID}
+  client-secret: ${SPOTIFY_CLIENT_SECRET}
+  redirect-url: http://127.0.0.1:8080/callback
+  refresh-token: ${SPOTIFY_REFRESH_TOKEN}

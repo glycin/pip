@@ -21,10 +21,13 @@ repositories {
 
 extra["springAiVersion"] = "1.0.1"
 
+val spotifyWebApiVersion =  "9.3.0"
+
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.ai:spring-ai-starter-mcp-server")
     implementation("org.springframework:spring-web")
+    implementation("se.michaelthelin.spotify:spotify-web-api-java:$spotifyWebApiVersion")
 }
 
 dependencyManagement {
