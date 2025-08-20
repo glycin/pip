@@ -18,6 +18,7 @@ class ToolConfiguration {
 
     @Bean
     fun spotifyTools(spotifyService: SpotifyService): ToolCallbackProvider {
+
         return MethodToolCallbackProvider
             .builder()
             .toolObjects(spotifyService)

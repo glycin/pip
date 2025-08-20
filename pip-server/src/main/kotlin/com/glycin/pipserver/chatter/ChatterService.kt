@@ -33,7 +33,7 @@ class ChatterService(
                 .prompt(Prompt("""
                     $input
                 """.trimIndent()))
-                .system("${ChatterPrompts.CHATTER_GENERIC_PROMPT} ${if(think)"/think" else "/no_think"}")
+                .system("${ChatterPrompts.MUSICIAN_PROMPT} ${if(think)"/think" else "/no_think"}")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
                 .call()
                 .content()

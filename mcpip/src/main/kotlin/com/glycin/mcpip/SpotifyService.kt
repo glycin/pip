@@ -9,9 +9,11 @@ import org.springframework.ai.tool.annotation.ToolParam
 import org.springframework.stereotype.Service
 import se.michaelthelin.spotify.SpotifyApi
 import se.michaelthelin.spotify.SpotifyHttpManager
+import se.michaelthelin.spotify.model_objects.specification.Track
 import kotlin.random.Random
 
 private const val PLAYLIST_ID = "spotify:playlist:4agDUCts2VBH5yBr20YUSB"
+private const val DEVICE_NAME = "GLYCINWORK"
 
 @Service
 class SpotifyService(
@@ -52,31 +54,30 @@ class SpotifyService(
         @ToolParam(description = "The name of the song to be played") songName: String,
     ): String {
         log.info("PLAY SONG TOOL INVOKED => Trying to find song: $songName")
-        val devices = spotifyApi.usersAvailableDevices.build().execute()
-        return devices.takeIf { !it.isNullOrEmpty() }
-            ?.first()
-            ?.let {
-                val tracks = spotifyApi.searchTracks(songName)
-                    .market(CountryCode.EU)
-                    .limit(1)
-                    .offset(0)
-                    .build()
-                    .execute()
-                    .items
-                    .toList()
+        return searchSong(songName)?.let { track ->
+            playTrack(track)
+        } ?: "Could not find a song with name $songName to play"
+    }
 
-                tracks.takeIf { it.isNotEmpty() }
-                    ?.first()
-                    ?.let { track ->
-                        log.info("Found a song to play ${track.name}")
-                        spotifyApi.startResumeUsersPlayback()
-                            .device_id(devices.first().id)
-                            .uris(JsonParser.parseString("[\"${track.uri}\"]").asJsonArray)
-                            .build()
-                            .execute()
-                        "Now playing ${track.name}, performed by ${track.artists.joinToString { it.name }}, from the album ${track.album.name} released in ${track.album.releaseDate}"
-                    } ?: "Could not find a song with name $songName to play"
-            } ?: "Could not find an active device to play song $songName"
+    @Tool(description = "Play music from an artist. Input is the name of the artist")
+    fun playArtist(
+        @ToolParam(description = "The name of the artist to play music from") artistName: String,
+    ): String {
+        log.info("PLAY ARTIST TOOL INVOKED => Trying to find song by artist: $artistName")
+        return searchSong(songName = null, artistName = artistName)?.let { track ->
+            playTrack(track)
+        } ?: "Could not find a song from artist $artistName"
+    }
+
+    @Tool(description = "Play a song by a specific artist. Input is the name of the song and the name of the artist")
+    fun playSongFromArtist(
+        @ToolParam(description = "The name of the song to be played") songName: String,
+        @ToolParam(description = "The name of the artist that performs the song") artistName: String,
+    ): String {
+        log.info("PLAY SONG BY ARTIST TOOL INVOKED => Trying to find song $songName by artist: $artistName")
+        return searchSong(songName, artistName)?.let { track ->
+            playTrack(track)
+        } ?: "Could not find a song $songName from artist $artistName"
     }
 
     @Tool(description = "Start playing from the metal playlist")
@@ -96,5 +97,47 @@ class SpotifyService(
                     .execute()
                 "Music is now playing from the metal playlist."
             } ?: "Could not play music. Something went wrong."
+    }
+
+    private fun searchSong(songName: String? = null, artistName: String? = null): Track? {
+        if(songName == null && artistName == null) {
+            log.info("Could not search because there was no song or artist given")
+            return null
+        }
+
+        val trackQuery = songName?.let { song ->
+            "track:$song"
+        } ?: ""
+        val artistQuery = artistName?.let { artist ->
+            "artist:$artist"
+        } ?: ""
+
+        log.info("Searching for song using query: $trackQuery $artistQuery")
+        return spotifyApi.searchTracks("$trackQuery $artistQuery")
+            .market(CountryCode.EU)
+            .limit(1)
+            .offset(0)
+            .build()
+            .execute()
+            .items
+            .toList()
+            .firstOrNull()?.also {
+                log.info("Found a song to play ${it.name} by ${it.artists.joinToString { a -> a.name }}")
+            }
+    }
+
+    private fun playTrack(track: Track): String {
+        val devices = spotifyApi.usersAvailableDevices.build().execute()
+        return devices.takeIf { !it.isNullOrEmpty() }
+            ?.firstOrNull { it.name == DEVICE_NAME }
+            ?.let { device ->
+                spotifyApi.startResumeUsersPlayback()
+                    .device_id(devices.first().id)
+                    .uris(JsonParser.parseString("[\"${track.uri}\"]").asJsonArray)
+                    .build()
+                    .execute()
+                log.info("Now playing ${track.name} on ${device.name}")
+                "Now playing ${track.name}, performed by ${track.artists.joinToString { it.name }}, from the album ${track.album.name} released in ${track.album.releaseDate}"
+            } ?: "Could not find an active device to play song ${track.name}"
     }
 }
