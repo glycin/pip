@@ -4,6 +4,7 @@ import com.glycin.pipp.context.CodeGraphBuilder
 import com.glycin.pipp.http.PipRequestBody
 import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.prompts.CodingPrompts
+import com.glycin.pipp.settings.PipSettings
 import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
@@ -20,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
+import java.io.File
 import javax.swing.JComponent
 
 private const val FPS = 120L
@@ -27,6 +29,7 @@ private const val FPS = 120L
 class Manager(
     private val scope: CoroutineScope,
     private val project: Project,
+    private val pipSettings: PipSettings,
 ): Disposable {
 
     private val editor = FileEditorManager.getInstance(project).selectedTextEditor
@@ -108,14 +111,20 @@ class Manager(
         }
     }
 
-    fun showContextReload() {
+    fun showAndDoContextReload() {
         DumbService.getInstance(project).runReadActionInSmartMode {
             ProgressManager.getInstance().runProcessWithProgressSynchronously(
                 {
                     val (nodes, edges) = CodeGraphBuilder(project).build()
-                    val json = GsonBuilder().disableHtmlEscaping().create()
+                    val json = GsonBuilder()
+                        .disableHtmlEscaping()
+                        .setPrettyPrinting()
+                        .create()
                         .toJson(mapOf("nodes" to nodes, "links" to edges))
-                    println(json)
+                    pipSettings.state.jsonExportPath?.let { path ->
+                        val file = File(path)
+                        file.writeText(json)
+                    }
                 },
                 "Building PSI Graph",
                 true,

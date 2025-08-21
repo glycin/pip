@@ -32,6 +32,10 @@
                     factoryClass="com.glycin.pipp.context.GraphViewFactory"
                     icon="AllIcons.Actions.PrettyPrint"
                     canCloseContents="true"/>
+
+        <applicationConfigurable id="PipSettings"
+                                 instance="com.glycin.pipp.settings.PipConfigurable"
+                                 displayName="Pip Settings"/>
     </extensions>
 
     <actions>

@@ -1,6 +1,7 @@
 package com.glycin.pipp
 
 import com.glycin.pipp.http.PipRestClient
+import com.glycin.pipp.settings.PipSettings
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
@@ -15,9 +16,9 @@ class MainService(
     private var inputHandler: InputHandler? = null
     private var manager: Manager? = null
 
-    fun init(project: Project) {
+    fun init(project: Project, settings: PipSettings) {
         if(manager != null) { return }
-        manager = Manager(scope, project).also { pm ->
+        manager = Manager(scope, project, settings).also { pm ->
             inputHandler = InputHandler(pm).also { pi ->
                 KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(pi)
             }

@@ -21,7 +21,7 @@ class InputHandler(
                 e.isAltDown &&
                 !e.isControlDown &&
                 !e.isShiftDown) {
-                manager.showContextReload()
+                manager.showAndDoContextReload()
                 return true
             }
         }
