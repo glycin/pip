@@ -30,7 +30,7 @@
         <toolWindow id="CodeGraphWindow"
                     anchor="right"
                     factoryClass="com.glycin.pipp.context.GraphViewFactory"
-                    icon="AllIcons.Actions.SynchronizeScrolling"
+                    icon="AllIcons.Actions.PrettyPrint"
                     canCloseContents="true"/>
     </extensions>
 

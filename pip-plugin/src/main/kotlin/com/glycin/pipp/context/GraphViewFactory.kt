@@ -1,9 +1,5 @@
 package com.glycin.pipp.context
 
-import com.google.gson.GsonBuilder
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.progress.ProgressManager
-import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
@@ -32,21 +28,5 @@ class GraphViewFactory: ToolWindowFactory {
         val content = contentFactory.createContent(panel, "", false)
 
         toolWindow.contentManager.addContent(content)
-    }
-
-    private fun computeGraphAsync(project: Project, onDone: (String) -> Unit) {
-        DumbService.getInstance(project).runReadActionInSmartMode {
-            ProgressManager.getInstance().runProcessWithProgressSynchronously(
-                {
-                    val (nodes, edges) = CodeGraphBuilder(project).build()
-                    val json = GsonBuilder().disableHtmlEscaping().create()
-                        .toJson(mapOf("nodes" to nodes, "links" to edges))
-                    ApplicationManager.getApplication().invokeLater { onDone(json) }
-                },
-                "Building PSI Graph",
-                true,
-                project
-            )
-        }
     }
 }

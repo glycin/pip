@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Minimal 3D Force Graph</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #111; }
+    #graph { width: 100%; height: 100%; }
+    /* Left sidebar */
+    #inspector {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 280px;
+      background: #12151c;
+      color: #e6e6e6;
+      border-right: 1px solid #232733;
+      font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      display: flex;
+      flex-direction: column;
+    }
+    #inspector .inspector-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 10px;
+      background: #0e1118;
+      border-bottom: 1px solid #232733;
+      font-weight: 600;
+    }
+    #inspector-title {
+      color: #9ad1ff;
+    }
+    #inspector-clear {
+      background: transparent;
+      color: #9aa0a6;
+      border: 1px solid #2a2f3a;
+      border-radius: 3px;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+    #inspector-clear:hover { color: #fff; border-color: #3a4050; }
+    #inspector-content {
+      margin: 0;
+      padding: 10px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow: auto;
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="graph"></div>
+  <!-- Inspector sidebar -->
+  <aside id="inspector" aria-live="polite">
+    <div class="inspector-header">
+      <span id="inspector-title">Inspector</span>
+      <button id="inspector-clear" title="Clear">✕</button>
+    </div>
+    <pre id="inspector-content">{ click a node }</pre>
+  </aside>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

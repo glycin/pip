@@ -3,6 +3,8 @@ QWEN 3 thinking mode on "blabla bla text /think"
 
 QWEN 3 thinking mode off "blabla bla text /no_think"
 
+Run graph server -> npx vite
+
 Embedding model -> https://huggingface.co/jinaai/jina-embeddings-v4 (maybe?)
 MUVERA? (https://research.google/blog/muvera-making-multi-vector-retrieval-as-fast-as-single-vector-search/)
 TODO:

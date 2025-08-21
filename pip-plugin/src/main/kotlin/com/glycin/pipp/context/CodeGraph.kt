@@ -13,6 +13,7 @@ data class CodeNode(
     val parentId: String? = null,
     val filePath: String? = null,
     val lineNumber: Int? = null,
+    val code: String? = null,
 )
 
 data class CodeEdge(

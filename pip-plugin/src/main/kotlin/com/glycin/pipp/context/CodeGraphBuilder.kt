@@ -48,6 +48,7 @@ class CodeGraphBuilder(
                                 parentId = classNodeId,
                                 filePath = method.containingFile?.virtualFile?.path,
                                 lineNumber = offsetToLine(method, method.textOffset),
+                                code = method.text
                             )
 
                             edges += CodeEdge(
