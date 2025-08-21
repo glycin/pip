@@ -9,8 +9,8 @@ import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
 import com.google.gson.GsonBuilder
 import com.intellij.openapi.Disposable
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.DumbService
@@ -129,7 +129,22 @@ class Manager(
     }
 
     private fun getContext() : String {
-        val document = editor?.document
-        return document?.text ?: ""
+        return editor?.let { e ->
+            val parts = e.caretModel.allCarets.mapNotNull { caret ->
+                val selectionModel = caret.editor.selectionModel
+                val text = selectionModel.selectedText
+                if(!text.isNullOrEmpty()) text else null
+            }
+
+            return when {
+                parts.isEmpty() -> getFullDocumentContext(e.document) // Nothing selected, send everything as context
+                parts.size == 1 -> parts.first()
+                else -> parts.joinToString(separator = "\n")
+            }
+        } ?: ""
+    }
+
+    private fun getFullDocumentContext(doc: Document): String {
+        return doc.text
     }
 }

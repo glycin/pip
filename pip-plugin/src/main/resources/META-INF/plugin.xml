@@ -27,7 +27,7 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="com.glycin.pipp.StartupActivity"/>
-        <toolWindow id="StarWarsWindow"
+        <toolWindow id="CodeGraphWindow"
                     anchor="right"
                     factoryClass="com.glycin.pipp.context.GraphViewFactory"
                     icon="AllIcons.Actions.SynchronizeScrolling"

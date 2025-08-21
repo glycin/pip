@@ -19,10 +19,8 @@ class GraphViewFactory: ToolWindowFactory {
             throw IllegalStateException("JCEF is not supported on this platform.")
         }
 
-        val htmlContent = this::class.java.getResource("/graph/view.html")?.readText() ?: ""
-
         val browser = JBCefBrowser().apply {
-            loadHTML(htmlContent)
+            loadURL("http://localhost:5173/")
         }
 
         val panel = JPanel().apply {
@@ -34,12 +32,6 @@ class GraphViewFactory: ToolWindowFactory {
         val content = contentFactory.createContent(panel, "", false)
 
         toolWindow.contentManager.addContent(content)
-
-        computeGraphAsync(project) { json ->
-            browser.cefBrowser.executeJavaScript(
-                "window.renderGraph($json);", browser.cefBrowser.url, 0
-            )
-        }
     }
 
     private fun computeGraphAsync(project: Project, onDone: (String) -> Unit) {
