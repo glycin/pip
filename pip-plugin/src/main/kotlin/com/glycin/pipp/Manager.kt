@@ -1,14 +1,19 @@
 package com.glycin.pipp
 
+import com.glycin.pipp.context.CodeGraphBuilder
 import com.glycin.pipp.http.PipRequestBody
 import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
+import com.google.gson.GsonBuilder
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -100,6 +105,22 @@ class Manager(
                     responseHandler.processResponse(it)
                 }
             }
+        }
+    }
+
+    fun showContextReload() {
+        DumbService.getInstance(project).runReadActionInSmartMode {
+            ProgressManager.getInstance().runProcessWithProgressSynchronously(
+                {
+                    val (nodes, edges) = CodeGraphBuilder(project).build()
+                    val json = GsonBuilder().disableHtmlEscaping().create()
+                        .toJson(mapOf("nodes" to nodes, "links" to edges))
+                    println(json)
+                },
+                "Building PSI Graph",
+                true,
+                project
+            )
         }
     }
 

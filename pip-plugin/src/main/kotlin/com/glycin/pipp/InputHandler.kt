@@ -16,6 +16,14 @@ class InputHandler(
                 manager.showInput()
                 return true
             }
+
+            if(e.keyCode == KeyEvent.VK_L &&
+                e.isAltDown &&
+                !e.isControlDown &&
+                !e.isShiftDown) {
+                manager.showContextReload()
+                return true
+            }
         }
         return false
     }
