@@ -10,6 +10,7 @@ import com.glycin.pipserver.shared.CategorizationDto
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PipResponse
 import com.glycin.pipserver.shared.toDto
+import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 
@@ -41,7 +42,6 @@ class PipService(
 
     private fun codingRequest(request: PipRequestBody): PipResponse {
         val judgment = judgeService.judge(request)
-
         judgment?.let {
             LOG.info { "Judge Dredd says: ${judgment.verdict} because ${judgment.reason}" }
             return when (it.verdict.lowercase()) {

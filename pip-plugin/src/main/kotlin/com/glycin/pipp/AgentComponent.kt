@@ -84,7 +84,7 @@ class AgentComponent(
         repaint()
     }
 
-    private fun hideSpeechBubble() {
+    fun hideSpeechBubble() {
         speechBubble?.let {
             remove(it)
             speechBubble = null

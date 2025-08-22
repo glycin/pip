@@ -37,7 +37,7 @@ class CoderService(
                 t.takeUnless { it.text.isEmpty() }
             }
             .joinToString { it.text }
-        LOG.info { "Additional context: $additionalContext" }
+        //LOG.info { "Additional context: $additionalContext" }
         val response = with(pipRequestBody) {
             pipCoder
                 .prompt(Prompt("""

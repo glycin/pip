@@ -14,6 +14,7 @@ import com.glycin.pipp.utils.TextWriter
 import com.google.gson.GsonBuilder
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProgressManager
@@ -104,6 +105,7 @@ class Manager(
                     )
                 ).collect { e -> streamResponseHandler.processSse(e) }
             } else {
+                pip.changeStateTo(PipState.THINKING)
                 PipRestClient.getCategory(requestBody)?.let {
                     when(it.category) {
                         RequestCategory.JUST_CHATTING -> handleChattingRequest(requestBody, it, responseHandler)
@@ -143,30 +145,25 @@ class Manager(
         agentComponent.dispose()
     }
 
-    private fun getContext() : String {
-        return editor?.let { e ->
-            val parts = e.caretModel.allCarets.mapNotNull { caret ->
-                val selectionModel = caret.editor.selectionModel
-                val text = selectionModel.selectedText
-                if(!text.isNullOrEmpty()) text else null
-            }
-
-            return when {
-                parts.isEmpty() -> getFullDocumentContext(e.document) // Nothing selected, send everything as context
-                parts.size == 1 -> parts.first()
-                else -> parts.joinToString(separator = "\n")
-            }
-        } ?: ""
-    }
-
-    private fun getFullDocumentContext(doc: Document): String {
-        return doc.text
-    }
-
     private suspend fun handleCodingRequest(requestBody: PipRequestBody, categorizationDto: CategorizationDto, responseHandler: PipResponseHandler) {
         pip.changeStateTo(PipState.TYPING)
-        PipRestClient.doQuestion(requestBody.addCategory(categorizationDto))?.also { response ->
-            responseHandler.processResponse(response)
+        val context = getCodeContext()
+        println("---CONTEXT---")
+        println(context)
+        println("-------------")
+        val newRequest = PipRequestBody(
+            input = """
+                ${requestBody.input}
+                Code context provided by the user:
+                $context
+            """.trimIndent(),
+            think = requestBody.think,
+            chatId = requestBody.chatId,
+            category = categorizationDto.category,
+            categoryReason = categorizationDto.reason
+        )
+        PipRestClient.doQuestion(newRequest)?.also { response ->
+            responseHandler.processCodingResponse(response)
         }
     }
 
@@ -175,12 +172,12 @@ class Manager(
         PipRestClient.doQuestion(
             pipRequestBody = requestBody.addCategory(categorizationDto)
         )?.also { response ->
-            responseHandler.processResponse(response)
+            responseHandler.processChatResponse(response)
         }
     }
 
     private suspend fun handleMusicRequest(requestBody: PipRequestBody, categorizationDto: CategorizationDto, responseHandler: PipResponseHandler) {
-        pip.changeStateTo(PipState.IDLE)
+        pip.changeStateTo(PipState.THINKING)
         PipRestClient.doQuestion(
             PipRequestBody(
                 input = requestBody.input,
@@ -190,7 +187,7 @@ class Manager(
                 categoryReason = categorizationDto.reason
             )
         )?.also {
-            responseHandler.processResponse(it)
+            responseHandler.processMusicResponse(it)
         }
     }
 
@@ -199,7 +196,29 @@ class Manager(
         PipRestClient.doQuestion(
             pipRequestBody = requestBody.addCategory(categorizationDto)
         )?.also { response ->
-            responseHandler.processResponse(response)
+            responseHandler.processChatResponse(response)
         }
+    }
+
+    private fun getCodeContext() : String {
+        val e = editor ?: return ""
+
+        return ReadAction.compute<String, RuntimeException> {
+            val parts = e.caretModel.allCarets.mapNotNull { caret ->
+                val selectionModel = caret.editor.selectionModel
+                val text = selectionModel.selectedText
+                if(!text.isNullOrEmpty()) text else null
+            }
+
+            when {
+                parts.isEmpty() -> getFullDocumentContext(e.document) // Nothing selected, send everything as context
+                parts.size == 1 -> parts.first()
+                else -> parts.joinToString(separator = "\n")
+            }
+        }
+    }
+
+    private fun getFullDocumentContext(doc: Document): String {
+        return doc.text
     }
 }

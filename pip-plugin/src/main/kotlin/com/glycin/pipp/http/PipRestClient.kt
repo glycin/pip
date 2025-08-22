@@ -7,7 +7,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.sse.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.gson.*
 import kotlinx.coroutines.channels.awaitClose
@@ -21,7 +20,7 @@ object PipRestClient {
     private val client = HttpClient(CIO) {
         install(Logging) {
             logger = Logger.DEFAULT
-            level = LogLevel.BODY
+            level = LogLevel.NONE
             sanitizeHeader { header -> header == HttpHeaders.Authorization }
         }
 
@@ -52,25 +51,25 @@ object PipRestClient {
         else null
     }
 
-    suspend fun doQuestion(pipRequestBody: PipRequestBody): String? {
+    suspend fun doQuestion(pipRequestBody: PipRequestBody): PipResponse? {
         val response = client.post("$baseUrl/pip/help") {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
             setBody(pipRequestBody)
         }
 
-        return if(response.status == HttpStatusCode.OK) response.bodyAsText()
+        return if(response.status == HttpStatusCode.OK) response.body()
         else null
     }
 
-    suspend fun doCodeQuestion(codeRequest: PipRequestBody): String? {
+    suspend fun doCodeQuestion(codeRequest: PipRequestBody): PipResponse? {
         val response = client.post("$baseUrl/code/generate") {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
             setBody(codeRequest)
         }
 
-        return if(response.status == HttpStatusCode.OK) response.bodyAsText()
+        return if(response.status == HttpStatusCode.OK) response.body()
         else null
     }
 

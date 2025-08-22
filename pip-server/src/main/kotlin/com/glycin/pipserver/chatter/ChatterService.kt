@@ -2,6 +2,7 @@ package com.glycin.pipserver.chatter
 
 import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.shared.PipRequestBody
+import com.glycin.pipserver.util.withoutThinkTags
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.chat.memory.ChatMemory
 import org.springframework.ai.chat.prompt.Prompt
@@ -23,7 +24,7 @@ class ChatterService(
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
                 .call()
                 .content()
-                ?.let { ChatterResponse(it) }
+                ?.let { ChatterResponse(it.withoutThinkTags()) }
         }
     }
 
@@ -37,7 +38,7 @@ class ChatterService(
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
                 .call()
                 .content()
-                ?.let { ChatterResponse(it) }
+                ?.let { ChatterResponse(it.withoutThinkTags()) }
         }
     }
 }

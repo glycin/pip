@@ -20,6 +20,7 @@ class Pip(
     private val animator = PipAnimator()
 
     fun changeStateTo(newState: PipState) {
+        if(newState == state) { return }
         state = newState
         println("NEW PIP STATE IS $state")
     }

@@ -1,7 +1,6 @@
 package com.glycin.pipp
 
-import com.glycin.pipp.utils.Extensions.getAndRemoveBetween
-import com.glycin.pipp.utils.Extensions.getAndRemoveCodeBlock
+import com.glycin.pipp.http.PipResponse
 import com.glycin.pipp.utils.TextWriter
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.editor.Editor
@@ -10,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.min
 
 class PipResponseHandler(
     private val editor: Editor,
@@ -19,18 +19,55 @@ class PipResponseHandler(
     private val agentComponent: AgentComponent,
 ) {
 
-    fun processResponse(response: String) {
-        val (thinkBody, remaining) = response.getAndRemoveBetween("<think>", "</think>")
-        val (codeBody, cleaned) = remaining.getAndRemoveCodeBlock()
+    fun processMusicResponse(pipResponse: PipResponse) {
+        scope.launch(Dispatchers.EDT) {
+            pip.changeStateTo(PipState.SITTING)
+            delay(1500)
+            agentComponent.showSpeechBubble(pipResponse.response)
+            delay(10_000)
+            agentComponent.hideSpeechBubble()
+        }
+    }
+
+    fun processChatResponse(pipResponse: PipResponse) {
+        scope.launch(Dispatchers.EDT) {
+            pip.changeStateTo(PipState.WALL_SHOOTING)
+            delay(500)
+            agentComponent.showSpeechBubble(pipResponse.response)
+            delay(30_000)
+            agentComponent.hideSpeechBubble()
+        }
+    }
+
+    fun processCodingResponse(response: PipResponse) {
+        if(response.prankType.isNullOrEmpty()){
+            processAcceptedCoding(response)
+        } else {
+            processPrank(response)
+        }
+    }
+
+    private fun processAcceptedCoding(response: PipResponse) {
+        val codeFragments = response.code ?: emptyList()
 
         scope.launch(Dispatchers.EDT) {
-            TextWriter.deleteText(0, editor.document.textLength, editor, project)
-            pip.changeStateTo(PipState.TYPING)
-            delay(1500)
-            TextWriter.writeText(0, codeBody, editor, project)
+            delay(500)
+            codeFragments.forEach { cf ->
+                val validatedLine = if(cf.line >= editor.document.lineCount) 0 else cf.line
+                val startOffset = editor.document.getLineStartOffset(validatedLine)
+                val validatedEndOffset = min(startOffset + cf.code.length, editor.document.textLength)
+                TextWriter.replaceText(startOffset, validatedEndOffset, cf.code, editor, project)
+            }
             delay(1000)
             pip.changeStateTo(PipState.SITTING)
-            agentComponent.showSpeechBubble(cleaned.trim())
+            agentComponent.showSpeechBubble(response.response)
+        }
+    }
+
+    private fun processPrank(response: PipResponse) {
+        scope.launch(Dispatchers.EDT) {
+            delay(1000)
+            pip.changeStateTo(PipState.SITTING)
         }
     }
 }
