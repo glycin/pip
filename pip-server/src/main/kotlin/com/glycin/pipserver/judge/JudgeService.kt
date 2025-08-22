@@ -3,6 +3,7 @@ package com.glycin.pipserver.judge
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.shared.PipRequestBody
+import com.glycin.pipserver.util.parseToStructuredOutput
 import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.ai.chat.client.ChatClient
@@ -31,7 +32,10 @@ class JudgeService(
         }
 
         return categorization?.let { raw ->
-            parseToStructuredOutput<CategorizationResponse>(raw.withoutThinkTags())
+            val rawWithoutThinkTags = raw.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<CategorizationResponse>(rawWithoutThinkTags) { e ->
+                LOG.error { "Could not parse $rawWithoutThinkTags because ${e.message} " }
+            }
         }
     }
 
@@ -47,7 +51,10 @@ class JudgeService(
         }
 
         return judgment?.let { raw ->
-            parseToStructuredOutput<JudgeAgentResponse>(raw.withoutThinkTags())
+            val rawWithoutThinkTags = raw.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<JudgeAgentResponse>(rawWithoutThinkTags){ e ->
+                LOG.error { "Could not parse $rawWithoutThinkTags because ${e.message} " }
+            }
         }
     }
 
@@ -61,18 +68,12 @@ class JudgeService(
             .content()
 
         return troll?.let { raw ->
-            parseToStructuredOutput<TrollAgentResponse>(raw.withoutThinkTags()).also {
+            val rawWithoutThinkTags = raw.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<TrollAgentResponse>(rawWithoutThinkTags) { e ->
+                LOG.error { "Could not parse $rawWithoutThinkTags because ${e.message} " }
+            }.also {
                 LOG.info { "Troll agent says: ${it?.trollMode} with response ${it?.response}" }
             }
-        }
-    }
-
-    private inline fun <reified T> parseToStructuredOutput(response: String): T? {
-        return try {
-            objectMapper.readValue(response, T::class.java)
-        } catch (e: Exception) {
-            LOG.error{ "Failed to parse cleaned response $e"}
-            null
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.glycin.pipserver
 
+import com.glycin.pipserver.shared.CategorizationDto
 import com.glycin.pipserver.shared.PipRequestBody
+import com.glycin.pipserver.shared.PipResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -13,14 +15,22 @@ class PipController(
     private val pipService: PipService
 ) {
 
-    @PostMapping("/help")
-    fun generate(
+    @PostMapping("/categorize")
+    fun categorize(
         @RequestBody requestBody: PipRequestBody,
-    ): ResponseEntity<String> {
-        val response = pipService.requestHelp(requestBody)
-        return if(response.isNullOrEmpty())
+    ): ResponseEntity<CategorizationDto> {
+        val response = pipService.categorize(requestBody)
+        return if(response == null)
             ResponseEntity.noContent().build()
         else
             ResponseEntity.ok().body(response)
+    }
+
+    @PostMapping("/help")
+    fun generate(
+        @RequestBody requestBody: PipRequestBody,
+    ): ResponseEntity<PipResponse> {
+        val response = pipService.requestHelp(requestBody)
+        return ResponseEntity.ok().body(response)
     }
 }

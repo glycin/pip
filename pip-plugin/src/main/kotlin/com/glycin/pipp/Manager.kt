@@ -1,11 +1,14 @@
 package com.glycin.pipp
 
 import com.glycin.pipp.context.CodeGraphBuilder
+import com.glycin.pipp.http.CategorizationDto
 import com.glycin.pipp.http.PipRequestBody
 import com.glycin.pipp.http.PipRestClient
+import com.glycin.pipp.http.RequestCategory
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
 import com.glycin.pipp.ui.PipInputDialog
+import com.glycin.pipp.utils.Extensions.addCategory
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
 import com.google.gson.GsonBuilder
@@ -81,31 +84,34 @@ class Manager(
             return
         }
 
-        val context = getContext()
         val chatId = if(dialog.newChat) NanoId.generate().also { chatIds.add(it) } else chatIds.last()
+        val responseHandler = PipResponseHandler(editor, project, scope, pip, agentComponent)
+        val requestBody = PipRequestBody(
+            input = dialog.userInput,
+            think = dialog.think,
+            chatId =  chatId
+        )
 
         scope.launch(Dispatchers.IO) {
             if(dialog.stream) {
-                val responseHandler = PipStreamResponseHandler(editor, project, pip)
+                val streamResponseHandler = PipStreamResponseHandler(editor, project, pip)
                 TextWriter.deleteText(0, editor.document.textLength, editor, project)
                 PipRestClient.doCodeQuestionStream(
                     pipRequest = PipRequestBody(
-                        input = CodingPrompts.generateCodeRequestWithContext(dialog.userInput, context),
+                        input = CodingPrompts.generateCodeRequestWithContext(dialog.userInput, ""),
                         think = dialog.think,
                         chatId =  chatId
                     )
-                ).collect { e -> responseHandler.processSse(e) }
+                ).collect { e -> streamResponseHandler.processSse(e) }
             } else {
-                val responseHandler = PipResponseHandler(editor, project, scope, pip, agentComponent)
-                pip.changeStateTo(PipState.THINKING)
-                PipRestClient.doQuestion(
-                    pipRequestBody = PipRequestBody(
-                        input = CodingPrompts.generateCodeRequestWithContext(dialog.userInput, context),
-                        think = dialog.think,
-                        chatId =  chatId
-                    )
-                )?.also {
-                    responseHandler.processResponse(it)
+                PipRestClient.getCategory(requestBody)?.let {
+                    when(it.category) {
+                        RequestCategory.JUST_CHATTING -> handleChattingRequest(requestBody, it, responseHandler)
+                        RequestCategory.CODING -> handleCodingRequest(requestBody, it, responseHandler)
+                        RequestCategory.GAMES ->  { }
+                        RequestCategory.MUSIC -> handleMusicRequest(requestBody, it, responseHandler)
+                        RequestCategory.BUTLER -> handleButlerRequest(requestBody, it, responseHandler)
+                    }
                 }
             }
         }
@@ -155,5 +161,45 @@ class Manager(
 
     private fun getFullDocumentContext(doc: Document): String {
         return doc.text
+    }
+
+    private suspend fun handleCodingRequest(requestBody: PipRequestBody, categorizationDto: CategorizationDto, responseHandler: PipResponseHandler) {
+        pip.changeStateTo(PipState.TYPING)
+        PipRestClient.doQuestion(requestBody.addCategory(categorizationDto))?.also { response ->
+            responseHandler.processResponse(response)
+        }
+    }
+
+    private suspend fun handleChattingRequest(requestBody: PipRequestBody, categorizationDto: CategorizationDto, responseHandler: PipResponseHandler) {
+        pip.changeStateTo(PipState.THINKING)
+        PipRestClient.doQuestion(
+            pipRequestBody = requestBody.addCategory(categorizationDto)
+        )?.also { response ->
+            responseHandler.processResponse(response)
+        }
+    }
+
+    private suspend fun handleMusicRequest(requestBody: PipRequestBody, categorizationDto: CategorizationDto, responseHandler: PipResponseHandler) {
+        pip.changeStateTo(PipState.IDLE)
+        PipRestClient.doQuestion(
+            PipRequestBody(
+                input = requestBody.input,
+                think = false,
+                chatId = NanoId.generate(),
+                category = RequestCategory.MUSIC,
+                categoryReason = categorizationDto.reason
+            )
+        )?.also {
+            responseHandler.processResponse(it)
+        }
+    }
+
+    private suspend fun handleButlerRequest(requestBody: PipRequestBody, categorizationDto: CategorizationDto, responseHandler: PipResponseHandler) {
+        pip.changeStateTo(PipState.THINKING)
+        PipRestClient.doQuestion(
+            pipRequestBody = requestBody.addCategory(categorizationDto)
+        )?.also { response ->
+            responseHandler.processResponse(response)
+        }
     }
 }

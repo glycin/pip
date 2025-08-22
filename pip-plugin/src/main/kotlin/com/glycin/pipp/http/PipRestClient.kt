@@ -1,6 +1,7 @@
 package com.glycin.pipp.http
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -38,6 +39,17 @@ object PipRestClient {
         engine {
             requestTimeout = 60_000
         }
+    }
+
+    suspend fun getCategory(pipRequestBody: PipRequestBody): CategorizationDto? {
+        val response = client.post("$baseUrl/pip/categorize") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(pipRequestBody)
+        }
+
+        return if(response.status == HttpStatusCode.OK) response.body()
+        else null
     }
 
     suspend fun doQuestion(pipRequestBody: PipRequestBody): String? {

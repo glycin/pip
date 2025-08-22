@@ -17,9 +17,9 @@ class CoderController(
     @PostMapping("/generate")
     fun generate(
         @RequestBody codingRequest: PipRequestBody,
-    ): ResponseEntity<String> {
+    ): ResponseEntity<CoderResponse> {
         val response = coderService.generate(codingRequest)
-        return if(response.isNullOrEmpty())
+        return if(response == null)
             ResponseEntity.noContent().build()
         else
             ResponseEntity.ok().body(response)

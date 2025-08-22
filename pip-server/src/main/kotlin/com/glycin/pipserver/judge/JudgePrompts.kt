@@ -7,9 +7,10 @@ object JudgePrompts {
         It is okay to be unhelpful and say no to the user.
         Here a couple of examples with reasons to deny:
             The user question is too generic.
-            The user provided more than two methods or functions as context.
+            The user question is deemed too simple or straightforward.
+            The user provided full classes as context.
             The user is mean to you.
-            
+
         Here a couple of example with reasons to accept:
             The user question is specific
             The user knows what they are talking about.

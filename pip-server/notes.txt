@@ -3,7 +3,10 @@ QWEN 3 thinking mode on "blabla bla text /think"
 
 QWEN 3 thinking mode off "blabla bla text /no_think"
 
-Run graph server -> npx vite
+Run graph server -> npx vite (in the correct folder)
+Run embedding server (in the correct folder) ->
+ 1. .\Scripts\activate
+ 2. fastapi dev .\embeddingServer.py
 
 Embedding model -> https://huggingface.co/jinaai/jina-embeddings-v4 (maybe?)
 MUVERA? (https://research.google/blog/muvera-making-multi-vector-retrieval-as-fast-as-single-vector-search/)
