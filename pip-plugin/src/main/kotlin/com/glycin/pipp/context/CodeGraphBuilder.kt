@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.PsiShortNamesCache
+import com.glycin.pipp.utils.Extensions.fqMethodName
 
 class CodeGraphBuilder(
     private val project: Project,
@@ -70,17 +71,6 @@ class CodeGraphBuilder(
     private fun PsiClass.toClassId(): String = "class:${qualifiedName ?: System.identityHashCode(this)}"
 
     private fun PsiMethod.toMethodId(): String = "method:${this.fqMethodName()}"
-
-    private fun PsiMethod.fqMethodName(): String {
-        val cls = containingClass?.qualifiedName ?: "<anon>"
-        val sig = buildString {
-            append(name)
-            append("(")
-            append(parameterList.parameters.joinToString(",") { it.type.presentableText })
-            append(")")
-        }
-        return "$cls#$sig"
-    }
 
     private fun offsetToLine(element: PsiElement, offset: Int): Int? {
         val file = element.containingFile?.virtualFile ?: return null

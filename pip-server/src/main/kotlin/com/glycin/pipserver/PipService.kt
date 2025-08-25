@@ -44,6 +44,7 @@ class PipService(
         val judgment = judgeService.judge(request)
         judgment?.let {
             LOG.info { "Judge Dredd says: ${judgment.verdict} because ${judgment.reason}" }
+            LOG.info { "${request.input}" }
             return when (it.verdict.lowercase()) {
                 "deny", "denial" -> {
                     judgeService.troll(request, it)?.toResponse() ?: PipResponse.FAIL_RESPONSE

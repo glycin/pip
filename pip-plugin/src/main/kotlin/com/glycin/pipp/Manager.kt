@@ -1,6 +1,6 @@
 package com.glycin.pipp
 
-import com.glycin.pipp.context.CodeGraphBuilder
+import com.glycin.pipp.context.*
 import com.glycin.pipp.http.CategorizationDto
 import com.glycin.pipp.http.PipRequestBody
 import com.glycin.pipp.http.PipRestClient
@@ -9,13 +9,14 @@ import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
 import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.Extensions.addCategory
+import com.glycin.pipp.utils.Extensions.fqMethodName
+import com.glycin.pipp.utils.Extensions.getSelectedJavaDeclarations
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
 import com.google.gson.GsonBuilder
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.ReadAction
-import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.DumbService
@@ -148,15 +149,9 @@ class Manager(
     private suspend fun handleCodingRequest(requestBody: PipRequestBody, categorizationDto: CategorizationDto, responseHandler: PipResponseHandler) {
         pip.changeStateTo(PipState.TYPING)
         val context = getCodeContext()
-        println("---CONTEXT---")
-        println(context)
-        println("-------------")
+
         val newRequest = PipRequestBody(
-            input = """
-                ${requestBody.input}
-                Code context provided by the user:
-                $context
-            """.trimIndent(),
+            input = CodingPrompts.generateCodeRequestWithContext(requestBody.input, context),
             think = requestBody.think,
             chatId = requestBody.chatId,
             category = categorizationDto.category,
@@ -201,24 +196,61 @@ class Manager(
     }
 
     private fun getCodeContext() : String {
-        val e = editor ?: return ""
+        val javaSelection = project.getSelectedJavaDeclarations()
 
-        return ReadAction.compute<String, RuntimeException> {
-            val parts = e.caretModel.allCarets.mapNotNull { caret ->
-                val selectionModel = caret.editor.selectionModel
-                val text = selectionModel.selectedText
-                if(!text.isNullOrEmpty()) text else null
-            }
-
-            when {
-                parts.isEmpty() -> getFullDocumentContext(e.document) // Nothing selected, send everything as context
-                parts.size == 1 -> parts.first()
-                else -> parts.joinToString(separator = "\n")
-            }
+        val result = when {
+            javaSelection.selectedText == null -> getFullDocumentContext() // Nothing selected, send whole doc as context
+            javaSelection.classes.isEmpty() && javaSelection.methods.isEmpty() -> javaSelection.selectedText // No classes or methods, just send the selectec text
+            javaSelection.methods.isEmpty()-> javaSelection.selectedText // No methods selected, send only selected text
+            else -> getContextFromGraph(javaSelection)
         }
+
+        //println("FOUND CONTEXT IS:")
+        //println(result)
+        return result
     }
 
-    private fun getFullDocumentContext(doc: Document): String {
-        return doc.text
+    private fun getFullDocumentContext(): String {
+        val selectedEditor = FileEditorManager.getInstance(project).selectedTextEditor ?: return ""
+        return selectedEditor.document.text
+    }
+
+    private fun getContextFromGraph(javaSelection: JavaSelection): String {
+        return pipSettings.state.jsonExportPath?.let { path ->
+            val graphText = File(path).readText()
+            val graph = GsonBuilder()
+                .create()
+                .fromJson(graphText, CodeGraph::class.java)
+
+            val nodesMap = graph.nodes.associateBy { it.id }
+
+            val relevantMethodNodeIds = ReadAction.compute<List<String>, RuntimeException> {
+                graph.nodes
+                    .filter { n ->
+                        n.type == CodeNodeType.METHOD &&
+                        javaSelection.methods.any { it.fqMethodName() == n.fqName }
+                    }
+                    .map { it.id }
+                    .toList()
+            }
+
+            val relevantNodes = graph.links
+                .asSequence()
+                .filter { it.type == CodeEdgeType.INVOKES }
+                .filter { it.source in relevantMethodNodeIds || it.target in relevantMethodNodeIds }
+                .flatMap { listOfNotNull(nodesMap[it.source], nodesMap[it.target]) }
+                .toMutableSet()
+
+            relevantNodes.addAll(relevantMethodNodeIds.mapNotNull { nodesMap[it] })
+
+            return if(relevantNodes.isEmpty()) javaSelection.selectedText!! else buildString {
+                relevantNodes.forEach { n ->
+                    appendLine("Method with name ${n.name} in class ${nodesMap[n.parentId]?.name}.java on line ${n.lineNumber ?: 0}")
+                    appendLine(n.code ?: "")
+                    appendLine()
+                    appendLine("------")
+                }
+            }
+        } ?: javaSelection.selectedText!!
     }
 }

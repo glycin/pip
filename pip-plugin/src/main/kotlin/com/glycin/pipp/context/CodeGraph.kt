@@ -2,7 +2,7 @@ package com.glycin.pipp.context
 
 data class CodeGraph(
     val nodes: List<CodeNode>,
-    val edges: List<CodeEdge>,
+    val links: List<CodeEdge>,
 )
 
 data class CodeNode(

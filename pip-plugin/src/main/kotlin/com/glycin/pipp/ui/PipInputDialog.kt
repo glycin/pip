@@ -35,10 +35,13 @@ class PipInputDialog(project: Project): DialogWrapper(project) {
             }
             separator()
             row {
-                textField()
+                textArea()
+                    .label("Don't waste my time...")
                     .bindText(::userInput)
                     .focused()
                     .columns(25)
+                    .rows(5)
+                    .align(AlignX.FILL)
             }
             separator()
             row {

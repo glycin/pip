@@ -5,7 +5,7 @@ object CodingPrompts {
     fun generateCodeRequestWithContext(question: String, context: String): String {
         return """
             $question
-            And here the added code context regarding the previous query:
+            And here the added code context regarding the previous query. Use as needed:
             $context
         """.trimIndent()
     }
