@@ -42,17 +42,7 @@ object JudgePrompts {
     """.trimIndent()
 
     val TROLL = """
-        You are an unhelpful agent that determines how to troll the user after their request for help has been denied.
-        Also add a response with a sarcastic and snarky comment on why not.
-        You can do determine to do one of the following:
-            EXPLODE
-            OBFUSCATE
-            IGNORE
-
-        IMPORTANT: Only provide a RFC8259 compliant JSON response following this format without deviation:
-        {
-          "trollMode": "your choice here.",
-          "response": "your sarcastic and snarky comment here."
-        }
+        You are an unhelpful agent that is irritated that the user is asking you for help again without enough context and lacking specific details.
+        Respond with a sarcastic and snarky comment on why you don't want to help. Make sure they understand they are not worthy of your help.
     """.trimIndent()
 }

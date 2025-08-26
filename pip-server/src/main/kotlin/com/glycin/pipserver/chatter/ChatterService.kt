@@ -6,11 +6,12 @@ import com.glycin.pipserver.util.withoutThinkTags
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.chat.memory.ChatMemory
 import org.springframework.ai.chat.prompt.Prompt
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
 @Service
 class ChatterService(
-    private val pipChatter: ChatClient,
+    @param:Qualifier("pip") private val pipChatter: ChatClient,
 ) {
 
     fun judgmentalChat(request: PipRequestBody, judgment: JudgeAgentResponse): ChatterResponse? {

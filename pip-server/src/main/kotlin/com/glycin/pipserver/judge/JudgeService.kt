@@ -3,6 +3,7 @@ package com.glycin.pipserver.judge
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.shared.PipRequestBody
+import com.glycin.pipserver.shared.PrankType
 import com.glycin.pipserver.util.parseToStructuredOutput
 import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -16,7 +17,7 @@ private val LOG = KotlinLogging.logger {}
 
 @Service
 class JudgeService(
-    private val judgeDredd: ChatClient,
+    @param:Qualifier("pip") private val judgeDredd: ChatClient,
     @param:Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
 ) {
 
@@ -69,11 +70,10 @@ class JudgeService(
 
         return troll?.let { raw ->
             val rawWithoutThinkTags = raw.withoutThinkTags()
-            objectMapper.parseToStructuredOutput<TrollAgentResponse>(rawWithoutThinkTags) { e ->
-                LOG.error { "Could not parse $rawWithoutThinkTags because ${e.message} " }
-            }.also {
-                LOG.info { "Troll agent says: ${it?.trollMode} with response ${it?.response}" }
-            }
+            return TrollAgentResponse(
+                trollMode = PrankType.entries.toTypedArray().random().name,
+                response = rawWithoutThinkTags
+            )
         }
     }
 }

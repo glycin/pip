@@ -2,13 +2,18 @@ package com.glycin.pipserver
 
 import com.glycin.pipserver.chatter.ChatterResponse
 import com.glycin.pipserver.chatter.ChatterService
+import com.glycin.pipserver.coder.CoderPrompts
 import com.glycin.pipserver.coder.CoderResponse
 import com.glycin.pipserver.coder.CoderService
+import com.glycin.pipserver.coder.PrankerResponse
 import com.glycin.pipserver.judge.JudgeService
 import com.glycin.pipserver.judge.TrollAgentResponse
 import com.glycin.pipserver.shared.CategorizationDto
+import com.glycin.pipserver.shared.PipPrankRequestBody
+import com.glycin.pipserver.shared.PipPrankResponseDto
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PipResponse
+import com.glycin.pipserver.shared.PrankType
 import com.glycin.pipserver.shared.toDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -39,11 +44,19 @@ class PipService(
         } ?: PipResponse.FAIL_RESPONSE
     }
 
+    fun requestPrank(prankRequestBody: PipPrankRequestBody): PipPrankResponseDto {
+        LOG.info { "Handling prank request with type ${prankRequestBody.type} (${prankRequestBody.reason})" }
+        return when(prankRequestBody.type) {
+            PrankType.EXPLODE -> PipPrankResponseDto(prankRequestBody.reason, prankRequestBody.type, "")
+            PrankType.OBFUSCATE -> coderService.generateObfuscationPrank(prankRequestBody)?.toDto(prankRequestBody.type)
+            PrankType.TRANSLATE -> coderService.generateTranslationPrank(prankRequestBody)?.toDto(prankRequestBody.type)
+        } ?: PipPrankResponseDto(prankRequestBody.reason, prankRequestBody.type, "")
+    }
+
     private fun codingRequest(request: PipRequestBody): PipResponse {
         val judgment = judgeService.judge(request)
         return judgment?.let {
             LOG.info { "Judge Dredd says: ${judgment.verdict} because ${judgment.reason}" }
-            //LOG.info { "${request.input}" }
             when (it.verdict.lowercase()) {
                 "deny", "denial" -> {
                     judgeService.troll(request, it)?.toResponse() ?: PipResponse.FAIL_RESPONSE
@@ -89,5 +102,11 @@ class PipService(
         response = response,
         prankType = null,
         code = codeSnippets.map { it.toDto() }
+    )
+
+    private fun PrankerResponse.toDto(prankType: PrankType) = PipPrankResponseDto(
+        response = response,
+        type = prankType,
+        code = code,
     )
 }

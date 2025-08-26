@@ -1,7 +1,11 @@
 package com.glycin.pipp
 
 import com.glycin.pipp.http.CodeOperation
+import com.glycin.pipp.http.PipPrankRequestBody
 import com.glycin.pipp.http.PipResponse
+import com.glycin.pipp.http.PipRestClient
+import com.glycin.pipp.http.PrankType
+import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.readAction
@@ -52,7 +56,7 @@ class PipResponseHandler(
         }
 
         scope.launch(Dispatchers.Default) {
-            pip.changeStateTo(PipState.WALL_SHOOTING)
+            pip.changeStateTo(PipState.WALL_SHOOTING) //TODO:
             delay(500)
             agentComponent.showSpeechBubble(pipResponse.response)
             delay(30_000)
@@ -60,7 +64,7 @@ class PipResponseHandler(
         }
     }
 
-    fun processCodingResponse(pipResponse: PipResponse) {
+    fun processCodingResponse(pipResponse: PipResponse, originalInput: String, chatId: String?) {
         if(pipResponse.isFailResponse()) {
             processFailResponse()
             return
@@ -69,7 +73,7 @@ class PipResponseHandler(
         if(pipResponse.prankType.isNullOrEmpty()){
             processAcceptedCoding(pipResponse)
         } else {
-            processPrank(pipResponse)
+            processPrank(pipResponse, originalInput, chatId ?: NanoId.generate())
         }
     }
 
@@ -123,10 +127,41 @@ class PipResponseHandler(
         }
     }
 
-    private fun processPrank(response: PipResponse) {
+    private fun processPrank(response: PipResponse, originalInput: String, chatId: String) {
+        println("PROCESSING PRANK ${response.prankType}")
         scope.launch(Dispatchers.Default) {
-            delay(1000)
             pip.changeStateTo(PipState.SITTING)
+            agentComponent.showSpeechBubble(response.response)
+            delay(3000)
+
+            val prankType = PrankType.valueOf(response.prankType ?: "OBFUSCATE")
+
+            val requestBody = PipPrankRequestBody(
+                type = prankType ,
+                originalInput = originalInput,
+                reason = response.response,
+                context = editor.document.text,
+                chatId = chatId,
+            )
+
+            when(prankType) {
+                PrankType.TRANSLATE, PrankType.OBFUSCATE -> {
+                    PipRestClient.doPrank(requestBody)?.let {
+                        agentComponent.hideSpeechBubble()
+                        delay(3000)
+                        agentComponent.showSpeechBubble(it.response)
+                        TextWriter.replaceText(0, editor.document.textLength, it.code, editor.document, project)
+                    }
+                }
+                PrankType.EXPLODE -> {
+                    // TODO: Do kaboom
+                    delay(3000)
+                    agentComponent.hideSpeechBubble()
+                }
+            }
+
+            delay(1000)
+            pip.changeStateTo(PipState.SITTING) //TODO: Add pranking animations
         }
     }
 

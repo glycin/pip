@@ -16,10 +16,25 @@ class OllamaConfig(
     private val toolCallbackProvider: SyncMcpToolCallbackProvider,
 ) {
 
-    @Bean
+    @Bean("pip")
     fun pipClient(): ChatClient {
         return ChatClient.builder(ollama)
             .defaultToolCallbacks(toolCallbackProvider)
+            .defaultAdvisors(
+                SimpleLoggerAdvisor(),
+                MessageChatMemoryAdvisor.builder(chatMemory).build(),
+            )
+            .build()
+    }
+
+    @Bean("pip_coder")
+    fun pipCodingClient(): ChatClient {
+        val tools = toolCallbackProvider.toolCallbacks.filter {
+            !it.toolDefinition.name().startsWith("spring_ai_mcp_client_mcpip_play")
+        }
+
+        return ChatClient.builder(ollama)
+            .defaultToolCallbacks(tools)
             .defaultAdvisors(
                 SimpleLoggerAdvisor(),
                 MessageChatMemoryAdvisor.builder(chatMemory).build(),

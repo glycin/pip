@@ -1,6 +1,8 @@
 package com.glycin.pipserver
 
 import com.glycin.pipserver.shared.CategorizationDto
+import com.glycin.pipserver.shared.PipPrankRequestBody
+import com.glycin.pipserver.shared.PipPrankResponseDto
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PipResponse
 import org.springframework.http.ResponseEntity
@@ -33,4 +35,14 @@ class PipController(
         val response = pipService.requestHelp(requestBody)
         return ResponseEntity.ok().body(response)
     }
+
+    @PostMapping("/prank")
+    fun prank(
+        @RequestBody requestBody: PipPrankRequestBody,
+    ): ResponseEntity<PipPrankResponseDto> {
+        val response = pipService.requestPrank(requestBody)
+        return ResponseEntity.ok().body(response)
+    }
+
+    //TODO: Add PIP BORED endpoint
 }

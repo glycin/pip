@@ -159,7 +159,7 @@ class Manager(
         )
 
         PipRestClient.doQuestion(newRequest)?.also { response ->
-            responseHandler.processCodingResponse(response)
+            responseHandler.processCodingResponse(response, requestBody.input, requestBody.chatId)
         }
     }
 

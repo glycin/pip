@@ -3,7 +3,9 @@ package com.glycin.pipserver.coder
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.qdrant.QdrantService
+import com.glycin.pipserver.shared.PipPrankRequestBody
 import com.glycin.pipserver.shared.PipRequestBody
+import com.glycin.pipserver.util.NanoId
 import com.glycin.pipserver.util.getThinkText
 import com.glycin.pipserver.util.parseToStructuredOutput
 import com.glycin.pipserver.util.withoutThinkTags
@@ -23,7 +25,7 @@ private val LOG = KotlinLogging.logger {}
 
 @Service
 class CoderService(
-    private val pipCoder: ChatClient,
+    @param:Qualifier("pip_coder") private val pipCoder: ChatClient,
     private val qdrantService: QdrantService,
     @param:Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
 ) {
@@ -38,7 +40,6 @@ class CoderService(
             }
             .joinToString { it.text }
         //LOG.info { "Additional context: $additionalContext" }
-        LOG.info { pipRequestBody.input }
         val response = with(pipRequestBody) {
             pipCoder
                 .prompt(Prompt("""
@@ -58,6 +59,63 @@ class CoderService(
             objectMapper.parseToStructuredOutput<CoderResponse>(rawWithoutThink) { e ->
                 LOG.info { "Could not parse $rawWithoutThink because ${e.message}" }
             }
+        }
+    }
+
+    fun generateObfuscationPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
+        val obfuscatedCode = with(pipPrankRequestBody) {
+            pipCoder
+                .prompt(Prompt(context))
+                .system("${CoderPrompts.CODE_OBFUSCATOR_PROMPT} /no_think")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, NanoId.generate()) }
+                .call()
+                .content()
+        }
+
+        return generatePrank(pipPrankRequestBody, obfuscatedCode?.withoutThinkTags() ?: "")
+    }
+
+    fun generateTranslationPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
+        val translatedCode = with(pipPrankRequestBody) {
+            pipCoder
+                .prompt(Prompt(context))
+                .system("${CoderPrompts.CODE_TRANSLATOR_PROMPT} /no_think")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, NanoId.generate()) }
+                .call()
+                .content()
+        }
+        println(translatedCode)
+        return generatePrank(pipPrankRequestBody, translatedCode?.withoutThinkTags() ?: "")
+    }
+
+    private fun generatePrank(pipPrankRequestBody: PipPrankRequestBody, prankedCode: String): PrankerResponse? {
+        val additionalContext = qdrantService.search(pipPrankRequestBody.reason, null)
+            .mapNotNull { t ->
+                t.takeUnless { it.text.isEmpty() }
+            }
+            .joinToString { it.text }
+
+        val response = with(pipPrankRequestBody) {
+            pipCoder
+                .prompt(Prompt("""
+                    The original query is:
+                    $originalInput
+                    But a judge agent declined to help with the following reason: $reason.
+                    Let them know how you think about them!
+                    ${if(additionalContext.isEmpty()) "" else "Here some additional context that has been has said that could be relevant to this matter $additionalContext taken from a chat log. Use only if relevant." }
+                """.trimIndent()))
+                .system("${CoderPrompts.CODE_PRANKER_SYSTEM_PROMPT} /no_think")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
+                .call()
+                .content()
+        }
+
+        return response?.let { raw ->
+            val rawWithoutThink = raw.withoutThinkTags()
+            PrankerResponse(
+                response = rawWithoutThink,
+                code = prankedCode,
+            )
         }
     }
 

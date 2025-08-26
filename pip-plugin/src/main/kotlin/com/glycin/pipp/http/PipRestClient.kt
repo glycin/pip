@@ -62,6 +62,17 @@ object PipRestClient {
         else null
     }
 
+    suspend fun doPrank(prankRequestBody: PipPrankRequestBody): PipPrankResponseDto? {
+        val response = client.post("$baseUrl/pip/prank") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(prankRequestBody)
+        }
+
+        return if(response.status == HttpStatusCode.OK) response.body()
+        else null
+    }
+
     suspend fun doCodeQuestion(codeRequest: PipRequestBody): PipResponse? {
         val response = client.post("$baseUrl/code/generate") {
             contentType(ContentType.Application.Json)
