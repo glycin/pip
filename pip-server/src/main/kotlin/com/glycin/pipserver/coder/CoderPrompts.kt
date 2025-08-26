@@ -16,8 +16,10 @@ object CoderPrompts {
             "codeSnippets": [
                 {
                     "className": "The name of the class which contains the code",
-                    "line": "The line where the code should be inserted",
-                    "code": "The generated code goes here. This should never be less than a full method or function."
+                    "methodName": "The name of the method which contains the code. NULLABLE, so if you didn't write a method, set to null"
+                    "line": "The line where the code should be inserted or replaced",
+                    "operation": "Here add one word only, INSERT or REPLACE. The word is used to define if the code should be inserted in the document or if it should replace existing text",
+                    "code": "The generated code goes here. This should never be more than a full method or function."
                 }
             ]
         }

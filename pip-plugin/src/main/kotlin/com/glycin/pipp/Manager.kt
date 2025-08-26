@@ -97,7 +97,7 @@ class Manager(
         scope.launch(Dispatchers.IO) {
             if(dialog.stream) {
                 val streamResponseHandler = PipStreamResponseHandler(editor, project, pip)
-                TextWriter.deleteText(0, editor.document.textLength, editor, project)
+                TextWriter.deleteText(0, editor.document.textLength, editor.document, project)
                 PipRestClient.doCodeQuestionStream(
                     pipRequest = PipRequestBody(
                         input = CodingPrompts.generateCodeRequestWithContext(dialog.userInput, ""),
@@ -157,6 +157,7 @@ class Manager(
             category = categorizationDto.category,
             categoryReason = categorizationDto.reason
         )
+
         PipRestClient.doQuestion(newRequest)?.also { response ->
             responseHandler.processCodingResponse(response)
         }

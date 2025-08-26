@@ -17,7 +17,7 @@ private val LOG = KotlinLogging.logger {}
 @Service
 class JudgeService(
     private val judgeDredd: ChatClient,
-    @Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
+    @param:Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
 ) {
 
     fun categorize(pipRequestBody: PipRequestBody): CategorizationResponse? {

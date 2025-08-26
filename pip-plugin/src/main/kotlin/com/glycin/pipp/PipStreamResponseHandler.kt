@@ -70,7 +70,7 @@ class PipStreamResponseHandler(
     private fun addToEditor(event: String) {
         if(event.contains('`')) { return }
         val startOffset = editor.document.textLength
-        TextWriter.writeText(startOffset, event, editor, project)
+        TextWriter.writeText(startOffset, event, editor.document, project)
     }
 
     private fun String.containsNewLine() = contains("\n") || contains("\r\n") || contains("\r")

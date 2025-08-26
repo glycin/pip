@@ -1,6 +1,5 @@
 package com.glycin.pipserver.configuration
 
-import io.modelcontextprotocol.client.McpSyncClient
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor

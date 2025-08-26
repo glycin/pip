@@ -37,3 +37,7 @@ We need to disable banner and console logging for STDIO transport to work for th
 THINGS TO EXPLAIN:
 NO INTERACTION EMBEDDINGS VS FULL INTERACTION VS NO INTERACTION
 SINGLE VECTOR VS MULTI VECTOR EMBEDDINGS
+
+STUFF THAT CAN GO WRONG:
+- LLM Gives wrong structured responses
+- OLLAMA crashes

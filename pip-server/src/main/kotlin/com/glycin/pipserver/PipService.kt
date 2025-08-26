@@ -10,7 +10,6 @@ import com.glycin.pipserver.shared.CategorizationDto
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PipResponse
 import com.glycin.pipserver.shared.toDto
-import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 
@@ -28,24 +27,24 @@ class PipService(
     }
 
     fun requestHelp(request: PipRequestBody): PipResponse {
-        request.category?.let { category ->
+        return request.category?.let { category ->
             LOG.info { "Categorized response: $category (${request.categoryReason})" }
-            return when(category.uppercase()) {
+            when(category.uppercase()) {
                 "CODING" -> codingRequest(request)
                 "JUST_CHATTING" -> chattingRequest(request)
                 "GAMES" -> PipResponse.UNSUPPORTED_RESPONSE
                 "MUSIC" -> musicRequest(request)
                 else -> PipResponse.UNKNOWN_RESPONSE
             }
-        } ?: return PipResponse.FAIL_RESPONSE
+        } ?: PipResponse.FAIL_RESPONSE
     }
 
     private fun codingRequest(request: PipRequestBody): PipResponse {
         val judgment = judgeService.judge(request)
-        judgment?.let {
+        return judgment?.let {
             LOG.info { "Judge Dredd says: ${judgment.verdict} because ${judgment.reason}" }
-            LOG.info { "${request.input}" }
-            return when (it.verdict.lowercase()) {
+            //LOG.info { "${request.input}" }
+            when (it.verdict.lowercase()) {
                 "deny", "denial" -> {
                     judgeService.troll(request, it)?.toResponse() ?: PipResponse.FAIL_RESPONSE
                 }
@@ -59,7 +58,7 @@ class PipService(
                     PipResponse.FAIL_RESPONSE
                 }
             }
-        } ?: return PipResponse.FAIL_RESPONSE
+        } ?: PipResponse.FAIL_RESPONSE
     }
 
     private fun chattingRequest(request: PipRequestBody): PipResponse {
@@ -73,7 +72,7 @@ class PipService(
     private fun musicRequest(request: PipRequestBody): PipResponse {
         return chatService.chat(request)?.toResponse() ?: PipResponse.FAIL_RESPONSE
     }
-    
+
     private fun ChatterResponse.toResponse() = PipResponse(
         response = response,
         prankType = null,

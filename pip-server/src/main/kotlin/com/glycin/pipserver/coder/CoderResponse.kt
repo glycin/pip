@@ -7,6 +7,8 @@ data class CoderResponse(
 
 data class CodeSnippets(
     val className: String,
+    val methodName: String?,
     val line: Int,
+    val operation: String,
     val code: String,
 )

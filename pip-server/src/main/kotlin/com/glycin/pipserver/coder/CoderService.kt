@@ -25,7 +25,7 @@ private val LOG = KotlinLogging.logger {}
 class CoderService(
     private val pipCoder: ChatClient,
     private val qdrantService: QdrantService,
-    @Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
+    @param:Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
 ) {
 
     fun generate(
@@ -38,10 +38,11 @@ class CoderService(
             }
             .joinToString { it.text }
         //LOG.info { "Additional context: $additionalContext" }
+        LOG.info { pipRequestBody.input }
         val response = with(pipRequestBody) {
             pipCoder
                 .prompt(Prompt("""
-                    $input.
+                    $input
                     The validation agent said this about the query: ${judgement.reason}.
                     ${if(additionalContext.isEmpty()) "" else "Here some additional context that riccardo has said relevant to this matter $additionalContext taken from a chat log. Use only if relevant." }
                 """.trimIndent()))
@@ -71,7 +72,8 @@ class CoderService(
                     $input.
                     The validation agent said this about the query: ${judgement.reason}.
                     Here some additional context that riccardo has said relevant to this matter $additionalContext taken from a chat log. Use only if relevant.
-                """.trimIndent()))                .system("${CoderPrompts.CODER_SYSTEM_PROMPT} ${if (think) "/think" else "/no_think"}")
+                """.trimIndent()))
+                .system("${CoderPrompts.CODER_SYSTEM_PROMPT} ${if (think) "/think" else "/no_think"}")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
                 .stream()
                 .content()

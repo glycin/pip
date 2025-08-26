@@ -1,6 +1,7 @@
 package com.glycin.pipserver.qdrant
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.MediaType
 import org.springframework.http.client.SimpleClientHttpRequestFactory
@@ -8,9 +9,11 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 
+private val LOG = KotlinLogging.logger {}
+
 @Service
 class EmbeddingService(
-    @Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
+    @param:Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
 ) {
 
     private val client = RestClient.builder()
@@ -31,8 +34,7 @@ class EmbeddingService(
                 .retrieve()
                 .body(EmbeddingResponse::class.java)
         } catch (e: Exception) {
-            println("Error calling the pip vectorizer: ${e.message}")
-            e.printStackTrace()
+            LOG.error { "Error calling the pip vectorizer: ${e.message}" }
             null
         }
     }

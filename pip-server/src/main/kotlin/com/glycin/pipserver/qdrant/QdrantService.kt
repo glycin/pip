@@ -1,5 +1,6 @@
 package com.glycin.pipserver.qdrant
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.qdrant.client.QdrantClient
 import io.qdrant.client.QdrantGrpcClient
 import io.qdrant.client.grpc.Points
@@ -22,6 +23,8 @@ import java.time.format.DateTimeFormatter
 private const val SLACK_COLLECTION = "pip_slack"
 private const val PREFILTER_LIMIT = 50L
 private const val RESULT_LIMIT = 3L
+
+private val LOG = KotlinLogging.logger {}
 
 @Service
 class QdrantService(
@@ -104,8 +107,13 @@ class QdrantService(
             queryPoints.setFilter(filter)
         }
 
-        return qdrant.queryAsync(queryPoints.build()).get()
-            .mapNotNull { it.toDto() }
+        return runCatching {
+            qdrant.queryAsync(queryPoints.build()).get()
+                .mapNotNull { it.toDto() }
+        }.getOrElse {
+            LOG.error { "Could not connect to qdrant -> ${it.message}" }
+            emptyList()
+        }
     }
 
     private fun embed(query: String): EmbeddingResponse? {
