@@ -23,6 +23,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
@@ -30,6 +31,8 @@ import java.io.File
 import javax.swing.JComponent
 
 private const val FPS = 120L
+private const val MARGIN_X = 5f
+private const val MARGIN_Y = 35f
 
 class Manager(
     private val scope: CoroutineScope,
@@ -51,6 +54,9 @@ class Manager(
 
     private val chatIds = mutableListOf(NanoId.generate())
 
+    private var maxX : Float = 0.0f
+    private var maxY : Float = 0.0f
+
     init {
         contentComponent.let {
             it.add(agentComponent)
@@ -70,12 +76,14 @@ class Manager(
         scope.launch(Dispatchers.EDT) {
             val visibleArea = scrollModel?.visibleArea!!
             scrollModel.addVisibleAreaListener {
-                //TODO: Animate the movement when screen resizes
-                val newX = (it.newRectangle.width - pip.width - 5f) + it.newRectangle.x
-                val newY = (it.newRectangle.height - pip.height + 35f) + it.newRectangle.y
-                pip.position = Vec2(newX, newY)
+                maxX = (it.newRectangle.width - pip.width - MARGIN_X) + it.newRectangle.x
+                maxY = (it.newRectangle.height - pip.height + MARGIN_Y) + it.newRectangle.y
+                pip.anchor(maxX, maxY)
             }
-            pip.position = Vec2(visibleArea.width - pip.width - 5f, visibleArea.height - pip.height.toFloat() + 35)
+
+            maxX = visibleArea.width - pip.width - MARGIN_X
+            maxY = visibleArea.height - pip.height.toFloat() + MARGIN_Y
+            pip.position = Vec2(maxX, maxY)
         }
     }
 

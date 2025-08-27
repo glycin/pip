@@ -21,7 +21,7 @@ class PipAnimator {
     private val thinking = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-thinking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 10)
     private val typing = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-typing.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 8)
     private val idleLick = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-sitting-licking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 14)
-
+    private val headbanging = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-metal.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 5)
     private var currentSprite : BufferedImage
     private var currentAnimationIndex = 0
     private var skipFrameCount = 0
@@ -42,15 +42,8 @@ class PipAnimator {
             PipState.JUMPING -> showAnimation(jump)
             PipState.THINKING -> showAnimation(thinking)
             PipState.TYPING -> showAnimation(typing)
+            PipState.METAL -> showAnimation(headbanging)
         }
-
-        /*if(facing == Facing.LEFT) {
-            g.drawImage(currentSprite, position.x.roundToInt() + width, position.y.roundToInt(), -width, height, null)
-        }else{
-            g.drawImage(currentSprite, position.x.roundToInt(), position.y.roundToInt(), width, height, null)
-        }*/
-
-        //g.drawImage(currentSprite, position.x.roundToInt(), position.y.roundToInt(), width, height, null)
     }
 
     fun getCurrentSprite() = currentSprite

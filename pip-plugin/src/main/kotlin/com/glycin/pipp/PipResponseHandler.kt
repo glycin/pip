@@ -41,11 +41,11 @@ class PipResponseHandler(
         }
 
         scope.launch(Dispatchers.Default) {
-            pip.changeStateTo(PipState.SITTING)
+            pip.changeStateTo(PipState.METAL)
             delay(1500)
             agentComponent.showSpeechBubble(pipResponse.response)
-            delay(10_000)
-            agentComponent.hideSpeechBubble()
+            delay(30_000)
+            agentComponent.hideSpeechBubble(false)
         }
     }
 
@@ -154,7 +154,7 @@ class PipResponseHandler(
                     }
                 }
                 PrankType.EXPLODE -> {
-                    // TODO: Do kaboom
+
                     delay(3000)
                     agentComponent.hideSpeechBubble()
                 }

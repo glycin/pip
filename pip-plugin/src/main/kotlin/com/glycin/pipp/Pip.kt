@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.Graphics2D
+import kotlin.math.max
 import kotlin.math.roundToInt
 
 private const val DEFAULT_WIDTH = 200
@@ -17,6 +18,7 @@ class Pip(
     private val scope: CoroutineScope,
 ) {
     private var state = PipState.SLEEPING
+    private var facing = Facing.LEFT
     private val animator = PipAnimator()
 
     fun changeStateTo(newState: PipState) {
@@ -49,7 +51,24 @@ class Pip(
     }
 
     fun render(g: Graphics2D) {
-        g.drawImage(animator.getCurrentSprite(), position.x.roundToInt(), position.y.roundToInt(), width, height, null)
+        val currentSprite = animator.getCurrentSprite()
+
+        if(facing == Facing.LEFT) {
+            g.drawImage(currentSprite, position.x.roundToInt() + width, position.y.roundToInt(), -width, height, null)
+        }else{
+            g.drawImage(currentSprite, position.x.roundToInt(), position.y.roundToInt(), width, height, null)
+        }
+    }
+
+    fun anchor(maxX: Float, maxY: Float) {
+        val new = if(state == PipState.HANG_IDLE) {
+            val y = position.y.coerceIn(0f, max(maxY, 1f))
+            Vec2(maxX, y)
+        } else {
+            val x = position.x.coerceIn(0f, max(maxX, 1f))
+            Vec2(x, maxY)
+        }
+        position = new
     }
 }
 
@@ -63,5 +82,11 @@ enum class PipState {
     WALL_SHOOTING,
     JUMPING,
     THINKING,
-    TYPING
+    TYPING,
+    METAL,
+}
+
+enum class Facing {
+    LEFT,
+    RIGHT
 }

@@ -84,7 +84,7 @@ class AgentComponent(
         repaint()
     }
 
-    fun hideSpeechBubble() {
+    fun hideSpeechBubble(setToIdle: Boolean = true) {
         speechBubble?.let {
             remove(it)
             speechBubble = null
@@ -95,7 +95,9 @@ class AgentComponent(
         }
         revalidate()
         repaint()
-        pip.changeStateTo(PipState.IDLE)
+        if(setToIdle) {
+            pip.changeStateTo(PipState.IDLE)
+        }
     }
 
     private fun drawMovementPoints(g: Graphics) {
