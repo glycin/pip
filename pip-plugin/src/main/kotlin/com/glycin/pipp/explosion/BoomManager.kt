@@ -30,7 +30,7 @@ class BoomManager(
         loadExplosionSprites()
     }
 
-    fun explode(mousePosition: Point, editor: Editor) {
+    fun explode(position: Point, editor: Editor) {
         if(editor.document.textLength <= 0) return
         if(editor.document.text.all { it.isWhitespace() || it == '\n' }) return
         val project = editor.project ?: return
@@ -39,13 +39,13 @@ class BoomManager(
         editor.settings.isVirtualSpace = true
 
         val yScroll = editor.scrollingModel.verticalScrollOffset
-        val objs = getLinesInRange(editor, mousePosition)
+        val objs = getLinesInRange(editor, position)
         BoomWriter.clear(editor, project)
 
         val boomComponent = BoomDrawComponent(
             explosionImages = explosion1,
             explosionObjects = objs,
-            position = mousePosition.toVec2(editor.scrollingModel),
+            position = position.toVec2(editor.scrollingModel),
             scope = scope,
             fps = FPS,
             finishedCallback = {

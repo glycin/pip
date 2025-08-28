@@ -22,6 +22,8 @@ class PipAnimator {
     private val typing = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-typing.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 8)
     private val idleLick = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-sitting-licking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 14)
     private val headbanging = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-metal.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 5)
+    private val dealWithIt = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-deal-with-it.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 32)
+    private val magic = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-magic-trick.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 9)
     private var currentSprite : BufferedImage
     private var currentAnimationIndex = 0
     private var skipFrameCount = 0
@@ -43,6 +45,8 @@ class PipAnimator {
             PipState.THINKING -> showAnimation(thinking)
             PipState.TYPING -> showAnimation(typing)
             PipState.METAL -> showAnimation(headbanging)
+            PipState.DEAL_WITH_IT -> showAnimation(dealWithIt)
+            PipState.MAGIC -> showAnimation(magic)
         }
     }
 

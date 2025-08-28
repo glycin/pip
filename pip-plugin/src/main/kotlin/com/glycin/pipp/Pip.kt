@@ -28,8 +28,12 @@ class Pip(
     }
 
     fun moveTo(newPosition: Vec2, duration: Long) {
+        if(Vec2.distance(newPosition, position) < 1.0f) return
+
         val startTime = System.currentTimeMillis()
         val startPosition = position
+
+        facing = if(newPosition.x < position.x) Facing.LEFT else Facing.RIGHT
 
         scope.launch(Dispatchers.Default) {
             while(true) {
@@ -84,6 +88,8 @@ enum class PipState {
     THINKING,
     TYPING,
     METAL,
+    MAGIC,
+    DEAL_WITH_IT,
 }
 
 enum class Facing {

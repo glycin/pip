@@ -1,5 +1,6 @@
 package com.glycin.pipp
 
+import com.glycin.pipp.explosion.BoomManager
 import com.glycin.pipp.http.CodeOperation
 import com.glycin.pipp.http.PipPrankRequestBody
 import com.glycin.pipp.http.PipResponse
@@ -22,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.max
 import kotlin.math.min
 
 private const val FAIL_RESPONSE = "I'm sleeping now, leave me alone."
@@ -32,6 +34,8 @@ class PipResponseHandler(
     private val scope: CoroutineScope,
     private val pip: Pip,
     private val agentComponent: AgentComponent,
+    private val maxX: Float,
+    private val maxY: Float,
 ) {
 
     fun processMusicResponse(pipResponse: PipResponse) {
@@ -145,23 +149,59 @@ class PipResponseHandler(
             )
 
             when(prankType) {
-                PrankType.TRANSLATE, PrankType.OBFUSCATE -> {
+                PrankType.TRANSLATE -> {
                     PipRestClient.doPrank(requestBody)?.let {
                         agentComponent.hideSpeechBubble()
-                        delay(3000)
+                        pip.moveTo(Vec2(maxX / 2, pip.position.y), 3000)
+                        delay(1000)
+                        pip.changeStateTo(PipState.DEAL_WITH_IT)
+                        delay(1000)
                         agentComponent.showSpeechBubble(it.response)
                         TextWriter.replaceText(0, editor.document.textLength, it.code, editor.document, project)
                     }
                 }
-                PrankType.EXPLODE -> {
 
-                    delay(3000)
-                    agentComponent.hideSpeechBubble()
+                PrankType.OBFUSCATE -> {
+                    PipRestClient.doPrank(requestBody)?.let {
+                        agentComponent.hideSpeechBubble()
+                        pip.moveTo(Vec2(maxX / 2, pip.position.y), 3000)
+                        delay(1000)
+                        pip.changeStateTo(PipState.MAGIC)
+                        delay(1000)
+                        pip.changeStateTo(PipState.SITTING) // TODO: Add talking anim
+                        agentComponent.showSpeechBubble(it.response)
+                        TextWriter.replaceText(0, editor.document.textLength, it.code, editor.document, project)
+                    }
+                }
+
+                PrankType.EXPLODE -> {
+                    val boomManager = BoomManager(scope)
+                    val targets = (0..5).map {
+                        val line = IntRange(0, editor.document.lineCount).random()
+                        val lineOffset = (editor.document.getLineStartOffset(line) + editor.document.getLineEndOffset(line)) / 2
+                        editor.offsetToXY(lineOffset)
+                    }
+
+                    pip.moveTo(Vec2(maxX - 50, maxY), 3000)
+                    delay(3500)
+                    pip.changeStateTo(PipState.JUMPING)
+                    pip.moveTo(Vec2(maxX, maxY - 100), 1000)
+                    delay(1100)
+                    targets.forEach { tar ->
+                        pip.changeStateTo(PipState.CLIMBING)
+                        pip.moveTo(Vec2(maxX, tar.y.toFloat()), 1000)
+                        delay(1100)
+                        pip.changeStateTo(PipState.WALL_SHOOTING)
+                        delay(900)
+                        pip.changeStateTo(PipState.HANG_IDLE)
+                        boomManager.explode(tar, editor)
+                        delay(1000)
+                    }
                 }
             }
 
-            delay(1000)
-            pip.changeStateTo(PipState.SITTING) //TODO: Add pranking animations
+            delay(30_000)
+            agentComponent.hideSpeechBubble()
         }
     }
 

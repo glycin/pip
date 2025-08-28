@@ -23,7 +23,6 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
@@ -95,7 +94,7 @@ class Manager(
         }
 
         val chatId = if(dialog.newChat) NanoId.generate().also { chatIds.add(it) } else chatIds.last()
-        val responseHandler = PipResponseHandler(editor, project, scope, pip, agentComponent)
+        val responseHandler = PipResponseHandler(editor, project, scope, pip, agentComponent, maxX, maxY)
         val requestBody = PipRequestBody(
             input = dialog.userInput,
             think = dialog.think,
