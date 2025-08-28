@@ -54,9 +54,13 @@ class AgentComponent(
         }
     }
 
-    fun showSpeechBubble(message: String) {
+    fun showSpeechBubble(message: String, setTalking: Boolean = true) {
         speechBubble?.let { remove(it) }
         closeButton?.let { remove(it) }
+
+        if(setTalking) {
+            pip.changeStateTo(PipState.TALKING)
+        }
 
         speechBubble = PipSpeechBubble(
             fullText = message,

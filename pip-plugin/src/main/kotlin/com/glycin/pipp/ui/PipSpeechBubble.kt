@@ -77,7 +77,7 @@ class PipSpeechBubble(
     }
 
     companion object {
-        private val BUBBLE_SHOW = SpriteSheetImageLoader.loadSprites("$BASE_PATH/bubble-show.png", 64, 32, 5)
+        //private val BUBBLE_SHOW = SpriteSheetImageLoader.loadSprites("$BASE_PATH/bubble-show.png", 64, 32, 5)
         private val BUBBLE = SpriteSheetImageLoader.loadSprites("$BASE_PATH/speech-bubble.png", 64, 32, 1).first()
     }
 }

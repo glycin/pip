@@ -27,9 +27,9 @@ class Pip(
         println("NEW PIP STATE IS $state")
     }
 
-    fun moveTo(newPosition: Vec2, duration: Long) {
+    fun moveTo(newPosition: Vec2, duration: Long, movingAnimationState: PipState = PipState.WALKING, endAnimationState: PipState = PipState.IDLE) {
         if(Vec2.distance(newPosition, position) < 1.0f) return
-
+        changeStateTo(movingAnimationState)
         val startTime = System.currentTimeMillis()
         val startPosition = position
 
@@ -42,6 +42,7 @@ class Pip(
                 position = Vec2.lerp(startPosition, newPosition, t)
                 if( t >= 1f) {
                     position = newPosition
+                    changeStateTo(endAnimationState)
                     break
                 }
 
@@ -90,6 +91,7 @@ enum class PipState {
     METAL,
     MAGIC,
     DEAL_WITH_IT,
+    TALKING
 }
 
 enum class Facing {

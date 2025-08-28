@@ -47,7 +47,7 @@ class PipResponseHandler(
         scope.launch(Dispatchers.Default) {
             pip.changeStateTo(PipState.METAL)
             delay(1500)
-            agentComponent.showSpeechBubble(pipResponse.response)
+            agentComponent.showSpeechBubble(pipResponse.response, false)
             delay(30_000)
             agentComponent.hideSpeechBubble(false)
         }
@@ -126,8 +126,9 @@ class PipResponseHandler(
             }
 
             delay(1000)
-            pip.changeStateTo(PipState.SITTING)
             agentComponent.showSpeechBubble(response.response)
+            delay(30_000)
+            agentComponent.hideSpeechBubble()
         }
     }
 
@@ -154,10 +155,11 @@ class PipResponseHandler(
                         agentComponent.hideSpeechBubble()
                         pip.moveTo(Vec2(maxX / 2, pip.position.y), 3000)
                         delay(1000)
-                        pip.changeStateTo(PipState.DEAL_WITH_IT)
-                        delay(1000)
-                        agentComponent.showSpeechBubble(it.response)
                         TextWriter.replaceText(0, editor.document.textLength, it.code, editor.document, project)
+                        delay(500)
+                        pip.changeStateTo(PipState.DEAL_WITH_IT)
+                        delay(3200)
+                        agentComponent.showSpeechBubble(it.response)
                     }
                 }
 
@@ -168,9 +170,10 @@ class PipResponseHandler(
                         delay(1000)
                         pip.changeStateTo(PipState.MAGIC)
                         delay(1000)
-                        pip.changeStateTo(PipState.SITTING) // TODO: Add talking anim
-                        agentComponent.showSpeechBubble(it.response)
                         TextWriter.replaceText(0, editor.document.textLength, it.code, editor.document, project)
+                        delay(500)
+                        agentComponent.showSpeechBubble(it.response)
+                        delay(20_000)
                     }
                 }
 
@@ -182,21 +185,24 @@ class PipResponseHandler(
                         editor.offsetToXY(lineOffset)
                     }
 
-                    pip.moveTo(Vec2(maxX - 50, maxY), 3000)
+                    pip.moveTo(Vec2(maxX, maxY), 3000)
                     delay(3500)
-                    pip.changeStateTo(PipState.JUMPING)
-                    pip.moveTo(Vec2(maxX, maxY - 100), 1000)
                     delay(1100)
                     targets.forEach { tar ->
-                        pip.changeStateTo(PipState.CLIMBING)
-                        pip.moveTo(Vec2(maxX, tar.y.toFloat()), 1000)
-                        delay(1100)
+                        pip.moveTo(Vec2(maxX, tar.y.toFloat()), 1000, PipState.CLIMBING, PipState.HANG_IDLE)
+                        delay(1500)
                         pip.changeStateTo(PipState.WALL_SHOOTING)
                         delay(900)
                         pip.changeStateTo(PipState.HANG_IDLE)
                         boomManager.explode(tar, editor)
                         delay(1000)
                     }
+                    delay(500)
+                    pip.moveTo(Vec2(maxX, maxY), 3000, PipState.CLIMBING, PipState.HANG_IDLE)
+                    delay(3200)
+                    pip.moveTo(Vec2(maxX - 50, maxY), 1500)
+                    delay(2000)
+                    agentComponent.showSpeechBubble("You're welcome!")
                 }
             }
 

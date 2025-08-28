@@ -24,6 +24,7 @@ class PipAnimator {
     private val headbanging = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-metal.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 5)
     private val dealWithIt = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-deal-with-it.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 32)
     private val magic = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-magic-trick.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 9)
+    private val talking = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-talking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 8)
     private var currentSprite : BufferedImage
     private var currentAnimationIndex = 0
     private var skipFrameCount = 0
@@ -47,6 +48,7 @@ class PipAnimator {
             PipState.METAL -> showAnimation(headbanging)
             PipState.DEAL_WITH_IT -> showAnimation(dealWithIt)
             PipState.MAGIC -> showAnimation(magic)
+            PipState.TALKING -> showAnimation(talking)
         }
     }
 
