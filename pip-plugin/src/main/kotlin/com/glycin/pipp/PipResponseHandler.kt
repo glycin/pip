@@ -10,7 +10,6 @@ import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.readAction
-import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
@@ -23,8 +22,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.awt.Point
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.random.Random
 
 private const val FAIL_RESPONSE = "I'm sleeping now, leave me alone."
 
@@ -60,7 +62,7 @@ class PipResponseHandler(
         }
 
         scope.launch(Dispatchers.Default) {
-            pip.changeStateTo(PipState.WALL_SHOOTING) //TODO:
+            pip.changeStateTo(PipState.WALL_SHOOTING)
             delay(500)
             agentComponent.showSpeechBubble(pipResponse.response)
             delay(30_000)
@@ -154,11 +156,12 @@ class PipResponseHandler(
                     PipRestClient.doPrank(requestBody)?.let {
                         agentComponent.hideSpeechBubble()
                         pip.moveTo(Vec2(maxX / 2, pip.position.y), 3000)
-                        delay(1000)
+                        delay(5000)
                         TextWriter.replaceText(0, editor.document.textLength, it.code, editor.document, project)
                         delay(500)
                         pip.changeStateTo(PipState.DEAL_WITH_IT)
-                        delay(3200)
+                        pip.face(Facing.RIGHT)
+                        delay(10_000)
                         agentComponent.showSpeechBubble(it.response)
                     }
                 }
@@ -167,11 +170,11 @@ class PipResponseHandler(
                     PipRestClient.doPrank(requestBody)?.let {
                         agentComponent.hideSpeechBubble()
                         pip.moveTo(Vec2(maxX / 2, pip.position.y), 3000)
-                        delay(1000)
+                        delay(3500)
                         pip.changeStateTo(PipState.MAGIC)
-                        delay(1000)
+                        delay(3000)
                         TextWriter.replaceText(0, editor.document.textLength, it.code, editor.document, project)
-                        delay(500)
+                        delay(1500)
                         agentComponent.showSpeechBubble(it.response)
                         delay(20_000)
                     }
@@ -179,26 +182,27 @@ class PipResponseHandler(
 
                 PrankType.EXPLODE -> {
                     val boomManager = BoomManager(scope)
-                    val targets = (0..5).map {
-                        val line = IntRange(0, editor.document.lineCount).random()
-                        val lineOffset = (editor.document.getLineStartOffset(line) + editor.document.getLineEndOffset(line)) / 2
-                        editor.offsetToXY(lineOffset)
+                    val targets = runBlocking(Dispatchers.EDT) {
+                        randomVisibleLines()
                     }
-
-                    pip.moveTo(Vec2(maxX, maxY), 3000)
-                    delay(3500)
-                    delay(1100)
+                    val pipClimbMargin = (pip.width / 2) - 20
+                    agentComponent.hideSpeechBubble(false)
+                    delay(2000)
+                    pip.moveTo(Vec2(maxX + pipClimbMargin, maxY), 3000)
+                    delay(4500)
                     targets.forEach { tar ->
-                        pip.moveTo(Vec2(maxX, tar.y.toFloat()), 1000, PipState.CLIMBING, PipState.HANG_IDLE)
-                        delay(1500)
+                        pip.moveTo(Vec2(maxX + pipClimbMargin, tar.y.toFloat()), 1000, PipState.CLIMBING, PipState.HANG_IDLE)
+                        delay(3000)
                         pip.changeStateTo(PipState.WALL_SHOOTING)
                         delay(900)
                         pip.changeStateTo(PipState.HANG_IDLE)
-                        boomManager.explode(tar, editor)
-                        delay(1000)
+                        runBlocking(Dispatchers.EDT) {
+                            boomManager.explode(tar, editor)
+                        }
+                        delay(3000)
                     }
                     delay(500)
-                    pip.moveTo(Vec2(maxX, maxY), 3000, PipState.CLIMBING, PipState.HANG_IDLE)
+                    pip.moveTo(Vec2(maxX + pipClimbMargin, maxY), 3000, PipState.CLIMBING, PipState.HANG_IDLE)
                     delay(3200)
                     pip.moveTo(Vec2(maxX - 50, maxY), 1500)
                     delay(2000)
@@ -215,6 +219,19 @@ class PipResponseHandler(
         scope.launch(Dispatchers.Default) {
             delay(500)
             pip.changeStateTo(PipState.SLEEPING)
+        }
+    }
+
+    private fun randomVisibleLines(): List<Point> {
+        val doc = editor.document
+        if (doc.lineCount == 0) return emptyList()
+        val visible = editor.scrollingModel.visibleArea
+        val topVisualLine = editor.yToVisualLine(visible.y)
+        val bottomVisualLine = max(topVisualLine, (editor.yToVisualLine(visible.y + visible.height)) - 5)
+        return (1..5).map {
+            val line = IntRange(topVisualLine, bottomVisualLine).random()
+            val lineOffset = (editor.document.getLineStartOffset(line) + editor.document.getLineEndOffset(line)) / 2
+            editor.offsetToXY(lineOffset)
         }
     }
 

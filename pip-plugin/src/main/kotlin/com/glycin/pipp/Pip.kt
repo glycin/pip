@@ -51,6 +51,12 @@ class Pip(
         }
     }
 
+    fun face(newFacing: Facing) {
+        if(newFacing != facing) {
+            facing = newFacing
+        }
+    }
+
     fun update() {
         animator.animate(state)
     }
@@ -66,14 +72,13 @@ class Pip(
     }
 
     fun anchor(maxX: Float, maxY: Float) {
-        val new = if(state == PipState.HANG_IDLE) {
-            val y = position.y.coerceIn(0f, max(maxY, 1f))
-            Vec2(maxX, y)
-        } else {
-            val x = position.x.coerceIn(0f, max(maxX, 1f))
-            Vec2(x, maxY)
+        when(state) {
+            PipState.CLIMBING, PipState.HANG_IDLE, PipState.WALL_SHOOTING -> return
+            else -> {
+                val x = position.x.coerceIn(0f, max(maxX, 1f))
+                position = Vec2(x, maxY)
+            }
         }
-        position = new
     }
 }
 

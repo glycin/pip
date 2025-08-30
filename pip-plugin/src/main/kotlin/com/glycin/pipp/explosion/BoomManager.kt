@@ -4,6 +4,7 @@ import com.glycin.pipp.toVec2
 import com.glycin.pipp.utils.SpriteSheetImageLoader
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
+import com.intellij.openapi.application.readAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorFontType
 import com.intellij.openapi.util.TextRange
@@ -40,6 +41,7 @@ class BoomManager(
 
         val yScroll = editor.scrollingModel.verticalScrollOffset
         val objs = getLinesInRange(editor, position)
+
         BoomWriter.clear(editor, project)
 
         val boomComponent = BoomDrawComponent(
@@ -86,21 +88,21 @@ class BoomManager(
         val explosionLine = editor.xyToLogicalPosition(explosionCenter).line
 
         return (0 until document.lineCount).flatMap { line ->
-            val startOffset = document.getLineStartOffset(line)
-            val endOffset = document.getLineEndOffset(line)
-            val distance = abs(editor.offsetToLogicalPosition(startOffset).line - explosionLine)
+                val startOffset = document.getLineStartOffset(line)
+                val endOffset = document.getLineEndOffset(line)
+                val distance = abs(editor.offsetToLogicalPosition(startOffset).line - explosionLine)
 
-            document.getText(TextRange(startOffset, endOffset)).mapIndexedNotNull { index, c ->
-                if(c.isWhitespace()) return@mapIndexedNotNull null
-                val charPos = editor.offsetToXY(startOffset + index)
-                MovableObject(
-                    position = charPos.toVec2(editor.scrollingModel),
-                    width = getCharWidth(editor, c),
-                    height = editor.lineHeight,
-                    char = c.toString(),
-                    inRange = distance <= EXP_STRENGTH,
-                )
-            }
+                document.getText(TextRange(startOffset, endOffset)).mapIndexedNotNull { index, c ->
+                    if (c.isWhitespace()) return@mapIndexedNotNull null
+                    val charPos = editor.offsetToXY(startOffset + index)
+                    MovableObject(
+                        position = charPos.toVec2(editor.scrollingModel),
+                        width = getCharWidth(editor, c),
+                        height = editor.lineHeight,
+                        char = c.toString(),
+                        inRange = distance <= EXP_STRENGTH,
+                    )
+                }
         }
     }
 

@@ -24,6 +24,7 @@ spring:
                 SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
                 SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
                 SPOTIFY_REFRESH_TOKEN: ${SPOTIFY_REFRESH_TOKEN}
+                SAVE_DIRECTORY: ${SAVE_DIRECTORY}
 #          servers-configuration: classpath:mcp-servers-example.json
 
 logging:

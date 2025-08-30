@@ -18,10 +18,17 @@ class ToolConfiguration {
 
     @Bean
     fun spotifyTools(spotifyService: SpotifyService): ToolCallbackProvider {
-
         return MethodToolCallbackProvider
             .builder()
             .toolObjects(spotifyService)
+            .build()
+    }
+
+    @Bean
+    fun memeTools(memeService: MemeService): ToolCallbackProvider {
+        return MethodToolCallbackProvider
+            .builder()
+            .toolObjects(memeService)
             .build()
     }
 }

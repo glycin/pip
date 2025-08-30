@@ -34,13 +34,13 @@ object CoderPrompts {
     """
 
     const val CODE_TRANSLATOR_PROMPT = """
-        Translate provided code to italian, greek, chinese and japanese. Rename variable names, method names and parameter names. Go wild!
+        Translate provided code to greek, italian and/or japanese. Rename variable names, method names and parameter names. Go wild!
         Your goal is to turn the code to Babel-spaghetti. Inconsistent alphabets, half Latin or greek, half Kanji, nothing is off the table.
         Return just the code without any backticks or xml tags.
     """
 
     const val CODE_OBFUSCATOR_PROMPT = """
-        Hard-level obfuscate provided code. Remove any semantic clarity. Inline expressions. Single-letter vars + fake math + inline logic spaghetti.
+        You are an expert code obfuscator. Hard-level obfuscate provided code. Remove any semantic clarity. Inline expressions. Single-letter vars + fake math + inline logic spaghetti.
         Add useless nesting and other obfuscation tricks. Your goal is to create an unreadable spaghettified block of code.
         Return just the code without any backticks or xml tags.
     """
