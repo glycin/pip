@@ -39,9 +39,9 @@ object CoderPrompts {
         Return just the code without any backticks or xml tags.
     """
 
-    const val CODE_OBFUSCATOR_PROMPT = """
-        You are an expert code obfuscator. Hard-level obfuscate provided code. Remove any semantic clarity. Inline expressions. Single-letter vars + fake math + inline logic spaghetti.
-        Add useless nesting and other obfuscation tricks. Your goal is to create an unreadable spaghettified block of code.
+    const val CODE_POET_PROMPT = """
+        You are an expert poet. You can generate any types of poems about a code snippet that you receive. Your poems highlight
+        all issues within the code base.
         Return just the code without any backticks or xml tags.
     """
 }

@@ -62,31 +62,30 @@ class CoderService(
         }
     }
 
-    fun generateObfuscationPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
-        LOG.info{ "Obfuscating ${pipPrankRequestBody.context}" }
-        val obfuscatedCode = with(pipPrankRequestBody) {
-            pipCoder
+    fun generatePoetryPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
+        val poemType = listOf("haiku", "poem", "limerick", "lyrical poem").random()
+        LOG.info{ "Generating a $poemType" }
+        val poem = pipCoder
                 .prompt(Prompt("""
-                    Completely rewrite the provided code so that it's a messy unreadable mess.
-                    $context
+                    Write a $poemType
                 """.trimIndent()))
-                .system("${CoderPrompts.CODE_OBFUSCATOR_PROMPT} /no_think") //TODO: This aint working, maybe have it write a haiku or a poem?
+                .system("${CoderPrompts.CODE_POET_PROMPT} /no_think")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, NanoId.generate()) }
                 .call()
                 .content()
-        }
-        LOG.info { obfuscatedCode }
-        return generatePrank(pipPrankRequestBody, obfuscatedCode?.withoutThinkTags() ?: "")
+
+        LOG.info { poem }
+        return generatePrank(pipPrankRequestBody, poem?.withoutThinkTags() ?: "")
     }
 
     fun generateTranslationPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
-        LOG.info{ "Translating  ${pipPrankRequestBody.context}" }
         val language = listOf("GREEK", "ITALIAN", "JAPANESE", "CHINESE").random()
+        LOG.info{ "Translating code to $language" }
         val translatedCode = with(pipPrankRequestBody) {
             pipCoder
                 .prompt(Prompt(
                     """
-                        Translate this to $language:
+                        Translate the code to $language:
                         $context
                     """.trimIndent()
                 ))

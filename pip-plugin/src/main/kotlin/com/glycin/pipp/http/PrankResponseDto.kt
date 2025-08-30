@@ -8,6 +8,6 @@ data class PipPrankResponseDto(
 
 enum class PrankType {
     EXPLODE,
-    OBFUSCATE,
+    POETRY,
     TRANSLATE,
 }

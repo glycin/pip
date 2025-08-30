@@ -2,7 +2,6 @@ package com.glycin.pipserver
 
 import com.glycin.pipserver.chatter.ChatterResponse
 import com.glycin.pipserver.chatter.ChatterService
-import com.glycin.pipserver.coder.CoderPrompts
 import com.glycin.pipserver.coder.CoderResponse
 import com.glycin.pipserver.coder.CoderService
 import com.glycin.pipserver.coder.PrankerResponse
@@ -37,7 +36,7 @@ class PipService(
             when(category.uppercase()) {
                 "CODING" -> codingRequest(request)
                 "JUST_CHATTING" -> chattingRequest(request)
-                "GAMES" -> PipResponse.UNSUPPORTED_RESPONSE
+                "GAMES" -> PipResponse.UNSUPPORTED_RESPONSE //TODO: Add playing games
                 "MUSIC" -> musicRequest(request)
                 else -> PipResponse.UNKNOWN_RESPONSE
             }
@@ -48,7 +47,7 @@ class PipService(
         LOG.info { "Handling prank request with type ${prankRequestBody.type} (${prankRequestBody.reason})" }
         return when(prankRequestBody.type) {
             PrankType.EXPLODE -> PipPrankResponseDto(prankRequestBody.reason, prankRequestBody.type, "")
-            PrankType.OBFUSCATE -> coderService.generateObfuscationPrank(prankRequestBody)?.toDto(prankRequestBody.type)
+            PrankType.POETRY -> coderService.generatePoetryPrank(prankRequestBody)?.toDto(prankRequestBody.type)
             PrankType.TRANSLATE -> coderService.generateTranslationPrank(prankRequestBody)?.toDto(prankRequestBody.type)
         } ?: PipPrankResponseDto(prankRequestBody.reason, prankRequestBody.type, "")
     }

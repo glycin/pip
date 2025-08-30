@@ -71,7 +71,7 @@ class JudgeService(
         return troll?.let { raw ->
             val rawWithoutThinkTags = raw.withoutThinkTags()
             return TrollAgentResponse(
-                trollMode = "OBFUSCATE",//PrankType.entries.toTypedArray().random().name,
+                trollMode = PrankType.entries.toTypedArray().random().name,
                 response = rawWithoutThinkTags
             )
         }

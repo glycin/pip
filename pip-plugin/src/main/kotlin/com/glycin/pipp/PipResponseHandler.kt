@@ -141,7 +141,7 @@ class PipResponseHandler(
             agentComponent.showSpeechBubble(response.response)
             delay(3000)
 
-            val prankType = PrankType.valueOf(response.prankType ?: "OBFUSCATE")
+            val prankType = PrankType.valueOf(response.prankType ?: "TRANSLATE")
 
             val requestBody = PipPrankRequestBody(
                 type = prankType ,
@@ -166,7 +166,7 @@ class PipResponseHandler(
                     }
                 }
 
-                PrankType.OBFUSCATE -> {
+                PrankType.POETRY -> {
                     PipRestClient.doPrank(requestBody)?.let {
                         agentComponent.hideSpeechBubble()
                         pip.moveTo(Vec2(maxX / 2, pip.position.y), 3000)
