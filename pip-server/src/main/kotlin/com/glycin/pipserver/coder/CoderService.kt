@@ -54,7 +54,7 @@ class CoderService(
         }
 
         return response?.let { raw ->
-            val thinkingTags = raw.getThinkText() // TODO: Add thinking text to response
+            val thinkingTags = raw.getThinkText()
             val rawWithoutThink = raw.withoutThinkTags()
             objectMapper.parseToStructuredOutput<CoderResponse>(rawWithoutThink) { e ->
                 LOG.info { "Could not parse $rawWithoutThink because ${e.message}" }
@@ -62,33 +62,44 @@ class CoderService(
         }
     }
 
-    fun generateObfuscationPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
-        val obfuscatedCode = with(pipPrankRequestBody) {
-            pipCoder
-                .prompt(Prompt(context))
-                .system("${CoderPrompts.CODE_OBFUSCATOR_PROMPT} /no_think")
+    fun generatePoetryPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
+        val poemType = listOf("haiku", "poem", "limerick", "lyrical poem").random()
+        LOG.info{ "Generating a $poemType" }
+        val poem = pipCoder
+                .prompt(Prompt("""
+                    Write a $poemType
+                """.trimIndent()))
+                .system("${CoderPrompts.CODE_POET_PROMPT} /no_think")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, NanoId.generate()) }
                 .call()
                 .content()
-        }
 
-        return generatePrank(pipPrankRequestBody, obfuscatedCode?.withoutThinkTags() ?: "")
+        LOG.info { poem }
+        return generatePrank(pipPrankRequestBody, poem?.withoutThinkTags() ?: "")
     }
 
     fun generateTranslationPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
+        val language = listOf("GREEK", "ITALIAN", "JAPANESE", "CHINESE").random()
+        LOG.info{ "Translating code to $language" }
         val translatedCode = with(pipPrankRequestBody) {
             pipCoder
-                .prompt(Prompt(context))
+                .prompt(Prompt(
+                    """
+                        Translate the code to $language:
+                        $context
+                    """.trimIndent()
+                ))
                 .system("${CoderPrompts.CODE_TRANSLATOR_PROMPT} /no_think")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, NanoId.generate()) }
                 .call()
                 .content()
         }
-        println(translatedCode)
+        LOG.info { translatedCode }
         return generatePrank(pipPrankRequestBody, translatedCode?.withoutThinkTags() ?: "")
     }
 
     private fun generatePrank(pipPrankRequestBody: PipPrankRequestBody, prankedCode: String): PrankerResponse? {
+        LOG.info { "Generating prank ${pipPrankRequestBody.type}" }
         val additionalContext = qdrantService.search(pipPrankRequestBody.reason, null)
             .mapNotNull { t ->
                 t.takeUnless { it.text.isEmpty() }

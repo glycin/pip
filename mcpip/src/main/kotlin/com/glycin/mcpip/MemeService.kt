@@ -3,6 +3,7 @@ package com.glycin.mcpip
 import org.slf4j.LoggerFactory
 import org.springframework.ai.tool.annotation.Tool
 import org.springframework.ai.tool.annotation.ToolParam
+import org.springframework.stereotype.Service
 import java.awt.*
 import java.awt.font.FontRenderContext
 import java.awt.font.LineBreakMeasurer
@@ -14,69 +15,78 @@ import java.io.File
 import java.text.AttributedString
 import javax.imageio.ImageIO
 import java.util.Base64
+import java.util.UUID
 
-
-class MemeService {
+@Service
+class MemeService(
+    private val memeProperties: MemeProperties,
+) {
 
     private val log = LoggerFactory.getLogger(SpotifyService::class.java)
 
-    @Tool(description = "Generate the 'one does not simply' meme")
+    @Tool(description = "Generate the 'one does not simply' meme. Use when you need a meme to indicate the user is wants to do something very hard.")
     fun memeNotSimply(
         @ToolParam(description = "The top text for the meme") topText: String,
         @ToolParam(description = "The bottom text for the meme") bottomText: String,
     ): String {
         log.info("GENERATE ONE DOES NOT SIMPLY MEME INVOKED => $topText / $bottomText")
-        return "Could not generate one does not simply meme"
+        return generateMemeBase64("one_does_not_simply.png", topText, bottomText)
     }
 
-    @Tool(description = "Generate the 'ancient aliens' meme")
-    fun memeHighFiveDrown(
+    @Tool(description = "Generate the 'ancient aliens' meme. Use when you are paranoid about something.")
+    fun memeAncientAliens(
         @ToolParam(description = "The top text for the meme") topText: String,
         @ToolParam(description = "The bottom text for the meme") bottomText: String,
     ): String {
         log.info("GENERATE ANCIENT ALIENS MEME INVOKED => $topText / $bottomText")
-        return "Could not generate ancient aliens meme"
+        return generateMemeBase64("ancient_aliens.png", topText, bottomText)
     }
 
-    @Tool(description = "Generate the 'sad pablo escobar' meme")
+    @Tool(description = "Generate the 'sad pablo escobar' meme. Use when you or the user are waiting for something for a long time.")
     fun memeSadPabloEscobar(
         @ToolParam(description = "The top text for the meme") topText: String,
         @ToolParam(description = "The bottom text for the meme") bottomText: String,
     ): String {
         log.info("GENERATE SAD PABLO ESCOBAR INVOKED => $topText / $bottomText")
-        return "Could not generate sad pablo escobar meme"
+        return generateMemeBase64("sad_pablo.png", topText, bottomText)
     }
 
-    @Tool(description = "Generate the 'hide the pain' meme")
+    @Tool(description = "Generate the 'hide the pain' meme. Use when you or the user are sad and are trying to hide it.")
     fun memeHideThePain(
         @ToolParam(description = "The top text for the meme") topText: String,
         @ToolParam(description = "The bottom text for the meme") bottomText: String,
     ): String {
         log.info("GENERATE HIDE THE PAIN INVOKED => $topText / $bottomText")
-        return "Could not generate hide the pain meme"
+        return generateMemeBase64("hide_the_pain.png", topText, bottomText)
     }
 
-    @Tool(description = "Generate the 'roll safe' meme")
+    @Tool(description = "Generate the 'roll safe' meme. Use when you want to indicate something clever.")
     fun memeThinkAboutIt(
         @ToolParam(description = "The top text for the meme") topText: String,
         @ToolParam(description = "The bottom text for the meme") bottomText: String,
     ): String {
         log.info("GENERATE ROLL SAFE INVOKED => $topText / $bottomText")
-        return "Could not generate roll safe meme"
+        return generateMemeBase64("roll_safe.jpg", topText, bottomText)
     }
 
-    @Tool(description = "Generate the 'challenge accepted' meme")
+    @Tool(description = "Generate the 'challenge accepted' meme. Use when you want to indicate a challenge is being taken on!")
     fun memeChallengeAccepted(
         @ToolParam(description = "The top text for the meme") topText: String,
         @ToolParam(description = "The bottom text for the meme") bottomText: String,
     ): String {
         log.info("GENERATE CHALLENGE ACCEPTED INVOKED => $topText / $bottomText")
-        return "Could not generate challenge accepted meme"
+        return generateMemeBase64("challenge_accepted.png", topText, bottomText)
     }
 
-    fun generateMemeBase64(imagePath: String, topText: String, bottomText: String): String {
-        // Load the original meme template image
-        val originalImage = ImageIO.read(File(imagePath))
+    private fun generateMemeBase64(templateName: String, topText: String, bottomText: String): String {
+        // Load image from resources/meme folder
+        val resourcePath = "/memes/$templateName"
+        val imageStream = object {}.javaClass.getResourceAsStream(resourcePath)
+            ?: return "Could not generate meme".also {
+                log.error("Could not get $templateName image")
+            }
+
+        val originalImage = ImageIO.read(imageStream)
         val image = BufferedImage(
             originalImage.width,
             originalImage.height,
@@ -111,7 +121,7 @@ class MemeService {
                 val fontMetrics = graphics.getFontMetrics(font)
                 val textWidth = fontMetrics.stringWidth(text)
 
-                if (textWidth <= maxWidth || fontSize <= 20) break
+                if (textWidth <= maxWidth) break
                 fontSize -= 2
             } while (fontSize > 20)
 
@@ -161,7 +171,6 @@ class MemeService {
 
                 // Draw black outline (stroke)
                 graphics.color = Color.BLACK
-                graphics.stroke = BasicStroke(4.0f)
 
                 // Draw outline by drawing text slightly offset in all directions
                 for (dx in -2..2) {
@@ -187,11 +196,9 @@ class MemeService {
         graphics.dispose()
 
         // Convert to Base64
-        val outputStream = ByteArrayOutputStream()
-        ImageIO.write(image, "png", outputStream)
-        val imageBytes = outputStream.toByteArray()
-        outputStream.close()
-
-        return Base64.getEncoder().encodeToString(imageBytes)
+        val outputFile = File("${memeProperties.saveDirectory}\\${UUID.randomUUID()}.png")
+        val writeOk = ImageIO.write(image, "png", outputFile)
+        if(!writeOk) return "Could not generate and save meme."
+        return "Generated meme and saved at: ${outputFile.absolutePath}"
     }
 }

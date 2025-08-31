@@ -10,6 +10,6 @@ data class PipPrankRequestBody(
 
 enum class PrankType {
     EXPLODE,
-    OBFUSCATE,
+    POETRY,
     TRANSLATE,
 }
