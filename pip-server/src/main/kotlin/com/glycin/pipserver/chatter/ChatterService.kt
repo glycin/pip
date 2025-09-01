@@ -1,21 +1,27 @@
 package com.glycin.pipserver.chatter
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.shared.PipRequestBody
+import com.glycin.pipserver.util.parseToStructuredOutput
 import com.glycin.pipserver.util.withoutThinkTags
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.chat.memory.ChatMemory
 import org.springframework.ai.chat.prompt.Prompt
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 
+private val LOG = KotlinLogging.logger {}
+
 @Service
 class ChatterService(
     @param:Qualifier("pip") private val pipChatter: ChatClient,
+    @param:Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
 ) {
 
     fun judgmentalChat(request: PipRequestBody, judgment: JudgeAgentResponse): ChatterResponse? {
-        return with(request) {
+        val response = with(request) {
             pipChatter
                 .prompt(Prompt("""
                     $input
@@ -25,7 +31,13 @@ class ChatterService(
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
                 .call()
                 .content()
-                ?.let { ChatterResponse(it.withoutThinkTags()) }
+        }
+
+        return response?.let {
+            val raw = it.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<ChatterResponse>(raw) { e ->
+                LOG.error { "Could not parse $raw because ${e.message} " }
+            }
         }
     }
 
@@ -39,7 +51,7 @@ class ChatterService(
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
                 .call()
                 .content()
-                ?.let { ChatterResponse(it.withoutThinkTags()) }
+                ?.let { ChatterResponse(it.withoutThinkTags(), null) }
         }
     }
 }

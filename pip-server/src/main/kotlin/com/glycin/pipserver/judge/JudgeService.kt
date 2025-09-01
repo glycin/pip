@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PrankType
+import com.glycin.pipserver.shared.TrollAgentResponseDto
 import com.glycin.pipserver.util.parseToStructuredOutput
 import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -59,7 +60,7 @@ class JudgeService(
         }
     }
 
-    fun troll(pipRequestBody: PipRequestBody, judgement: JudgeAgentResponse): TrollAgentResponse? {
+    fun troll(pipRequestBody: PipRequestBody, judgement: JudgeAgentResponse): TrollAgentResponseDto? {
         LOG.info { "Troll agent is handling request with id ${pipRequestBody.chatId}" }
         val troll = judgeDredd
             .prompt(Prompt("Original user query: ${pipRequestBody.input}. Denial reason ${judgement.reason}"))
@@ -70,10 +71,15 @@ class JudgeService(
 
         return troll?.let { raw ->
             val rawWithoutThinkTags = raw.withoutThinkTags()
-            return TrollAgentResponse(
-                trollMode = PrankType.entries.toTypedArray().random().name,
-                response = rawWithoutThinkTags
-            )
+            objectMapper.parseToStructuredOutput<TrollAgentResponse>(rawWithoutThinkTags){ e ->
+                LOG.error { "Could not parse $rawWithoutThinkTags because ${e.message} " }
+            }?.let { res ->
+                TrollAgentResponseDto(
+                    prankType = PrankType.entries.toTypedArray().random(),
+                    response = res.response,
+                    memeFileName = res.memeFileName
+                )
+            }
         }
     }
 }

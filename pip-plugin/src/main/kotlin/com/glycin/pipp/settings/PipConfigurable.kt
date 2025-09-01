@@ -13,6 +13,7 @@ class PipConfigurable: SearchableConfigurable {
 
     private var panel: JPanel? = null
     private var pathField: TextFieldWithBrowseButton? = null
+    private var memeFolderField: TextFieldWithBrowseButton? = null
     private val settings = ApplicationManager.getApplication().getService(PipSettings::class.java)
 
     override fun createComponent(): JComponent? {
@@ -56,6 +57,28 @@ class PipConfigurable: SearchableConfigurable {
             val s2 = JSeparator()
             add(s2, gbc)
 
+            gbc.gridy = 5
+            gbc.fill = GridBagConstraints.NONE
+
+            val infoLabel2 = JLabel("Path to read generated memes from.")
+            add(infoLabel2, gbc)
+            
+            gbc.gridy = 6
+            memeFolderField = TextFieldWithBrowseButton().apply {
+                textField.columns = 30 // similar to DSL .columns(30)
+                text = settings.state.memeSaveFolder.orEmpty()
+                addBrowseFolderListener(
+                    /* title    = */ "Select Meme Folder",
+                    /* description = */ "Select folder where memes are saved in.",
+                    /* project = */ null,
+                    /* fileChooserDescriptor = */ FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                )
+            }
+            add(memeFolderField!!, gbc)
+            gbc.gridy = 7
+            val s3 = JSeparator()
+            add(s3, gbc)
+
             gbc.weighty = 1.0
             add(Box.createVerticalGlue(), gbc)
         }
@@ -63,14 +86,19 @@ class PipConfigurable: SearchableConfigurable {
         return panel!!
     }
 
-    override fun isModified(): Boolean = pathField?.text != settings.state.jsonExportPath
+    override fun isModified(): Boolean {
+       return pathField?.text != settings.state.jsonExportPath ||
+       memeFolderField?.text != settings.state.memeSaveFolder
+    }
 
     override fun apply() {
         settings.state.jsonExportPath = pathField?.text ?: ""
+        settings.state.memeSaveFolder = memeFolderField?.text ?: ""
     }
 
     override fun reset() {
         pathField?.text = ""
+        memeFolderField?.text = ""
     }
 
     override fun getDisplayName(): String = "Settings For P.I.P"

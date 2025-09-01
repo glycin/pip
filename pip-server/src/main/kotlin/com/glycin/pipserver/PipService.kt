@@ -6,13 +6,13 @@ import com.glycin.pipserver.coder.CoderResponse
 import com.glycin.pipserver.coder.CoderService
 import com.glycin.pipserver.coder.PrankerResponse
 import com.glycin.pipserver.judge.JudgeService
-import com.glycin.pipserver.judge.TrollAgentResponse
 import com.glycin.pipserver.shared.CategorizationDto
 import com.glycin.pipserver.shared.PipPrankRequestBody
 import com.glycin.pipserver.shared.PipPrankResponseDto
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PipResponse
 import com.glycin.pipserver.shared.PrankType
+import com.glycin.pipserver.shared.TrollAgentResponseDto
 import com.glycin.pipserver.shared.toDto
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
@@ -88,18 +88,21 @@ class PipService(
     private fun ChatterResponse.toResponse() = PipResponse(
         response = response,
         prankType = null,
+        memeFileName = memeFileName,
         code = null,
     )
 
-    private fun TrollAgentResponse.toResponse() = PipResponse(
+    private fun TrollAgentResponseDto.toResponse() = PipResponse(
         response = response,
-        prankType = trollMode,
+        prankType = prankType.name,
+        memeFileName = memeFileName,
         code = null,
     )
 
     private fun CoderResponse.toResponse() = PipResponse(
         response = response,
         prankType = null,
+        memeFileName = null,
         code = codeSnippets.map { it.toDto() }
     )
 
