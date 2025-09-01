@@ -28,7 +28,6 @@ import kotlinx.coroutines.runBlocking
 import java.awt.Point
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.random.Random
 
 private const val FAIL_RESPONSE = "I'm sleeping now, leave me alone."
 
@@ -53,8 +52,11 @@ class PipResponseHandler(
             pip.changeStateTo(PipState.METAL)
             delay(1500)
             agentComponent.showSpeechBubble(pipResponse.response, false)
+            agentComponent.showCatJam()
             delay(30_000)
             agentComponent.hideSpeechBubble(false)
+            delay(3000)
+            agentComponent.hideCatJam()
         }
     }
 

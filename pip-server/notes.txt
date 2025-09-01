@@ -45,3 +45,11 @@ STUFF THAT CAN GO WRONG:
 - LLM Gives wrong structured responses
 - OLLAMA crashes
 - Fighting to get random responses, sometimes its easier to just do the random part urself.
+
+
+TODO:
+- ADD PIP STOP WHEN COPY PASTING THINGS WITH JUDGMENT
+- ADD BORED FLOW THAT MAKES PIP ADD TODO COMMENTS EVERYWHERE
+- ADD ABILITY TO PLAY TIC-TAC-TOE AND PONG WITH PIP
+- MAKE IT POSSIBLE TO RESUMMON PIP IN NEW DOCUMENT
+- BIG WANT -> Let pip play doom

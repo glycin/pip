@@ -1,5 +1,6 @@
 package com.glycin.pipp
 
+import com.glycin.pipp.ui.Gifs
 import com.glycin.pipp.ui.PipColors
 import com.glycin.pipp.ui.PipSpeechBubble
 import com.glycin.pipp.utils.Fonts
@@ -15,6 +16,7 @@ import java.awt.Graphics
 import java.awt.Graphics2D
 import javax.swing.JButton
 import javax.swing.JComponent
+import javax.swing.JLabel
 import kotlin.math.roundToInt
 
 class AgentComponent(
@@ -27,6 +29,7 @@ class AgentComponent(
     private var active = true
     private var speechBubble: PipSpeechBubble? = null
     private var closeButton : JButton? = null
+    private var catJamGif: JLabel? = null
 
     init {
         scope.launch(Dispatchers.EDT) {
@@ -102,6 +105,23 @@ class AgentComponent(
         if(setToIdle) {
             pip.changeStateTo(PipState.IDLE)
         }
+    }
+
+    fun showCatJam() {
+        catJamGif = JLabel(Gifs.CAT_JAM_GIF).apply {
+            setBounds(50, 50, 112, 112)
+        }
+        add(catJamGif)
+        revalidate()
+        repaint()
+    }
+
+    fun hideCatJam() {
+        if(catJamGif == null) return
+        remove(catJamGif)
+        catJamGif = null
+        revalidate()
+        repaint()
     }
 
     private fun drawMovementPoints(g: Graphics) {

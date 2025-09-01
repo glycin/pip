@@ -7,6 +7,7 @@ import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.http.RequestCategory
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
+import com.glycin.pipp.ui.IntroComponent
 import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.Extensions.addCategory
 import com.glycin.pipp.utils.Extensions.fqMethodName
@@ -23,6 +24,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
@@ -57,8 +59,13 @@ class Manager(
     private var maxY : Float = 0.0f
 
     init {
+        val introComponent = IntroComponent(scope).also {
+            it.bounds = contentComponent.bounds
+            it.isOpaque = false
+        }
         contentComponent.let {
             it.add(agentComponent)
+            it.add(introComponent)
             it.revalidate()
             it.repaint()
             it.addComponentListener(object : ComponentListener {
@@ -84,6 +91,8 @@ class Manager(
             maxY = visibleArea.height - pip.height.toFloat() + MARGIN_Y
             pip.position = Vec2(maxX, maxY)
         }
+
+        //introComponent.showIntro()
     }
 
     fun showInput() {
