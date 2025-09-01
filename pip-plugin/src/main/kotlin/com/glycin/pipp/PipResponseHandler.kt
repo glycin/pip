@@ -6,8 +6,10 @@ import com.glycin.pipp.http.PipPrankRequestBody
 import com.glycin.pipp.http.PipResponse
 import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.http.PrankType
+import com.glycin.pipp.settings.PipSettings
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
+import com.glycin.pipp.utils.showPngInPopup
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.readAction
 import com.intellij.openapi.command.WriteCommandAction
@@ -38,6 +40,7 @@ class PipResponseHandler(
     private val agentComponent: AgentComponent,
     private val maxX: Float,
     private val maxY: Float,
+    private val pipSettings: PipSettings,
 ) {
 
     fun processMusicResponse(pipResponse: PipResponse) {
@@ -62,7 +65,8 @@ class PipResponseHandler(
         }
 
         scope.launch(Dispatchers.Default) {
-            pip.changeStateTo(PipState.WALL_SHOOTING)
+            pip.changeStateTo(PipState.TALKING)
+            pipResponse.showMeme()
             delay(500)
             agentComponent.showSpeechBubble(pipResponse.response)
             delay(30_000)
@@ -75,6 +79,8 @@ class PipResponseHandler(
             processFailResponse()
             return
         }
+
+        pipResponse.showMeme()
 
         if(pipResponse.prankType.isNullOrEmpty()){
             processAcceptedCoding(pipResponse)
@@ -236,6 +242,15 @@ class PipResponseHandler(
     }
 
     private fun PipResponse.isFailResponse() = this.response == FAIL_RESPONSE
+
+    private fun PipResponse.showMeme() {
+        if(memeFileName.isNullOrEmpty()) return
+        val path = "${pipSettings.state.memeSaveFolder}\\$memeFileName"
+        println("Showing meme at path $path")
+        scope.launch(Dispatchers.EDT) {
+            showPngInPopup(agentComponent, path, listOf("I'm so funny", "Back to the 2010s!", "Miaouw?").random())
+        }
+    }
 }
 
 private data class CodeReadResult(

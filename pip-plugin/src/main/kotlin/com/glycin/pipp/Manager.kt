@@ -94,7 +94,7 @@ class Manager(
         }
 
         val chatId = if(dialog.newChat) NanoId.generate().also { chatIds.add(it) } else chatIds.last()
-        val responseHandler = PipResponseHandler(editor, project, scope, pip, agentComponent, maxX, maxY)
+        val responseHandler = PipResponseHandler(editor, project, scope, pip, agentComponent, maxX, maxY, pipSettings)
         val requestBody = PipRequestBody(
             input = dialog.userInput,
             think = dialog.think,

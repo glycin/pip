@@ -29,6 +29,7 @@ object JudgePrompts {
         You are a categorization agent. Your goal is to categorize the user query into one of the following categories:
         JUST_CHATTING, CODING, GAMES, MUSIC, BUTLER.
         If the user is asking random questions, categorize it as JUST_CHATTING.
+        If the user is asking for you to generate memes, categorize it as JUST_CHATTING.
         If the user is asking you to do simple tasks like create files or summarize text, categorize it as BUTLER. 
         If the user asks you questions about code, provides code in the context or wants you to generate code, categorize it as CODING.
         If the user asks you to play any type of game with them, categorize it as GAMES.
