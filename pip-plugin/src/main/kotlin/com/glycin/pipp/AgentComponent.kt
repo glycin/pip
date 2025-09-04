@@ -74,7 +74,7 @@ class AgentComponent(
 
         closeButton = JButton("CLOSE").apply {
             isOpaque = false
-            font = Fonts.pixelFont.deriveFont(Font.BOLD, 10f)
+            font = Fonts.pixelFont.deriveFont(Font.BOLD, 20f)
             foreground = JBColor.RED
             background = PipColors.transparent
             setBounds(pip.position.x.roundToInt(), 25, 75, 35)

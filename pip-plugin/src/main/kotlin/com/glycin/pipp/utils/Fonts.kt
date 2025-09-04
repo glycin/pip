@@ -6,7 +6,7 @@ import java.awt.GraphicsEnvironment
 object Fonts {
 
     val pixelFont: Font = try {
-        val fontUrl = javaClass.getResourceAsStream("/art/fonts/Pixeled.ttf")
+        val fontUrl = javaClass.getResourceAsStream("/art/fonts/PixeloidMono.ttf")
         Font.createFont(Font.TRUETYPE_FONT, fontUrl).also {
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(it)
         }

@@ -98,7 +98,7 @@ private class BubbleScrollPane(
         val font = Fonts.pixelFont
         val style = SimpleAttributeSet().apply {
             StyleConstants.setFontFamily(inputAttributes, font.family)
-            StyleConstants.setFontSize(inputAttributes, 10)
+            StyleConstants.setFontSize(inputAttributes, 20)
             StyleConstants.setItalic(inputAttributes, (font.style and Font.ITALIC) != 0)
             StyleConstants.setBold(inputAttributes, (font.style and Font.BOLD) != 0)
             StyleConstants.setForeground(inputAttributes, color)
