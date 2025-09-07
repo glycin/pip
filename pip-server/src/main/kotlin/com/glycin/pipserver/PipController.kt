@@ -1,6 +1,7 @@
 package com.glycin.pipserver
 
 import com.glycin.pipserver.shared.CategorizationDto
+import com.glycin.pipserver.shared.PipPasteBody
 import com.glycin.pipserver.shared.PipPrankRequestBody
 import com.glycin.pipserver.shared.PipPrankResponseDto
 import com.glycin.pipserver.shared.PipRequestBody
@@ -41,6 +42,14 @@ class PipController(
         @RequestBody requestBody: PipPrankRequestBody,
     ): ResponseEntity<PipPrankResponseDto> {
         val response = pipService.requestPrank(requestBody)
+        return ResponseEntity.ok().body(response)
+    }
+
+    @PostMapping("/paste")
+    fun paste(
+        @RequestBody requestBody: PipPasteBody,
+    ): ResponseEntity<PipResponse> {
+        val response = pipService.requestPasteReview(requestBody)
         return ResponseEntity.ok().body(response)
     }
 

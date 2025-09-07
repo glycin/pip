@@ -2,9 +2,12 @@ package com.glycin.pipp
 
 import com.glycin.pipp.context.*
 import com.glycin.pipp.http.CategorizationDto
+import com.glycin.pipp.http.PipPasteBody
 import com.glycin.pipp.http.PipRequestBody
 import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.http.RequestCategory
+import com.glycin.pipp.paste.PasteHandler
+import com.glycin.pipp.paste.PipPasteResponseHandler
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
 import com.glycin.pipp.ui.IntroComponent
@@ -18,13 +21,13 @@ import com.google.gson.GsonBuilder
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
@@ -54,6 +57,7 @@ class Manager(
     }
 
     private val chatIds = mutableListOf(NanoId.generate())
+    private lateinit var pasteHandler: PasteHandler
 
     private var maxX : Float = 0.0f
     private var maxY : Float = 0.0f
@@ -91,7 +95,7 @@ class Manager(
             maxY = visibleArea.height - pip.height.toFloat() + MARGIN_Y
             pip.position = Vec2(maxX, maxY)
         }
-
+        attachPasteHandler()
         //introComponent.showIntro()
     }
 
@@ -110,7 +114,7 @@ class Manager(
             chatId =  chatId
         )
 
-        scope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.Default) {
             if(dialog.stream) {
                 val streamResponseHandler = PipStreamResponseHandler(editor, project, pip)
                 TextWriter.deleteText(0, editor.document.textLength, editor.document, project)
@@ -158,7 +162,34 @@ class Manager(
         }
     }
 
+    fun interceptPaste(text: String, line: Int, offset: Int) {
+        if (editor?.document == null) return
+
+        pip.changeStateTo(PipState.STOP)
+        val requestBody = PipPasteBody(
+            pasteText = text,
+            pasteLine = line,
+            document = editor.document.text,
+            chatId = NanoId.generate()
+        )
+
+        scope.launch(Dispatchers.Default) {
+            PipRestClient.doPasteReview(requestBody)?.let {
+                PipPasteResponseHandler(
+                    pip = pip,
+                    request = requestBody,
+                    agentComponent = agentComponent,
+                    caretOffset = offset,
+                    scope = scope,
+                    document = editor.document,
+                    project = project,
+                ).handleResponse(it)
+            }
+        }
+    }
+
     override fun dispose() {
+        EditorActionManager.getInstance().setActionHandler("EditorPaste", pasteHandler.originalHandler)
         agentComponent.dispose()
     }
 
@@ -221,9 +252,6 @@ class Manager(
             javaSelection.methods.isEmpty()-> javaSelection.selectedText // No methods selected, send only selected text
             else -> getContextFromGraph(javaSelection)
         }
-
-        //println("FOUND CONTEXT IS:")
-        //println(result)
         return result
     }
 
@@ -269,5 +297,12 @@ class Manager(
                 }
             }
         } ?: javaSelection.selectedText!!
+    }
+
+    private fun attachPasteHandler() {
+        val editorActionManager = EditorActionManager.getInstance()
+        val originalPasteHandler = editorActionManager.getActionHandler("EditorPaste")
+        pasteHandler = PasteHandler(originalPasteHandler, this)
+        editorActionManager.setActionHandler("EditorPaste", pasteHandler)
     }
 }

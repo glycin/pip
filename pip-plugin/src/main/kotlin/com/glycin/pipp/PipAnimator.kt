@@ -54,6 +54,10 @@ class PipAnimator {
             PipState.DEAL_WITH_IT -> showAnimation(dealWithIt)
             PipState.MAGIC -> showAnimation(magic)
             PipState.TALKING -> showAnimation(talking)
+            PipState.STOP -> showAnimation(stop)
+            PipState.YOYO -> showAnimation(yoyo)
+            PipState.JUMP_UP -> showAnimation(jumpUp)
+            PipState.JUMP_DOWN -> showAnimation(jumpDown)
         }
     }
 

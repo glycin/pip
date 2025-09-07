@@ -3,6 +3,7 @@ package com.glycin.pipserver.coder
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.qdrant.QdrantService
+import com.glycin.pipserver.shared.PipPasteBody
 import com.glycin.pipserver.shared.PipPrankRequestBody
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.util.NanoId
@@ -74,7 +75,6 @@ class CoderService(
                 .call()
                 .content()
 
-        LOG.info { poem }
         return generatePrank(pipPrankRequestBody, poem?.withoutThinkTags() ?: "")
     }
 
@@ -94,8 +94,41 @@ class CoderService(
                 .call()
                 .content()
         }
-        LOG.info { translatedCode }
         return generatePrank(pipPrankRequestBody, translatedCode?.withoutThinkTags() ?: "")
+    }
+
+    fun reviewPastedCode(pasteBody: PipPasteBody): CoderResponse? {
+        LOG.info { "Reviewing pasted text" }
+        val additionalContext = qdrantService.search(pasteBody.pasteText, null)
+            .mapNotNull { t ->
+                t.takeUnless { it.text.isEmpty() }
+            }
+            .joinToString { it.text }
+
+        val response = with(pasteBody) {
+            pipCoder
+                .prompt(Prompt(
+                """
+                    Someone tried to paste the following at line $pasteLine:
+                    $pasteText
+                    Into this code:
+                    $document.
+                    Review the pasted text and add a TODO with any remarks you have on top of it. 
+                    Here some additional context taken from some chat logs:
+                    $additionalContext. Use only if relevant.
+                    """".trimIndent()))
+                .system("${CoderPrompts.CODER_SYSTEM_PROMPT} /no_think")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
+                .call()
+                .content()
+        }
+
+        return response?.let { raw ->
+            val rawWithoutThink = raw.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<CoderResponse>(rawWithoutThink) { e ->
+                LOG.info { "Could not parse $rawWithoutThink because ${e.message}" }
+            }
+        }
     }
 
     private fun generatePrank(pipPrankRequestBody: PipPrankRequestBody, prankedCode: String): PrankerResponse? {
@@ -113,7 +146,7 @@ class CoderService(
                     $originalInput
                     But a judge agent declined to help with the following reason: $reason.
                     Let them know how you think about them!
-                    ${if(additionalContext.isEmpty()) "" else "Here some additional context that has been has said that could be relevant to this matter $additionalContext taken from a chat log. Use only if relevant." }
+                    ${if(additionalContext.isEmpty()) "" else "Here some additional context that has been has been found in a chat log that could be relevant to this matter: $additionalContext. Use only if relevant." }
                 """.trimIndent()))
                 .system("${CoderPrompts.CODE_PRANKER_SYSTEM_PROMPT} /no_think")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }

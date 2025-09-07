@@ -96,7 +96,11 @@ enum class PipState {
     METAL,
     MAGIC,
     DEAL_WITH_IT,
-    TALKING
+    TALKING,
+    STOP,
+    YOYO,
+    JUMP_UP,
+    JUMP_DOWN,
 }
 
 enum class Facing {

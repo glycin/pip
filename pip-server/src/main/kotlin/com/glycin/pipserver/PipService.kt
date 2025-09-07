@@ -7,6 +7,7 @@ import com.glycin.pipserver.coder.CoderService
 import com.glycin.pipserver.coder.PrankerResponse
 import com.glycin.pipserver.judge.JudgeService
 import com.glycin.pipserver.shared.CategorizationDto
+import com.glycin.pipserver.shared.PipPasteBody
 import com.glycin.pipserver.shared.PipPrankRequestBody
 import com.glycin.pipserver.shared.PipPrankResponseDto
 import com.glycin.pipserver.shared.PipRequestBody
@@ -50,6 +51,10 @@ class PipService(
             PrankType.POETRY -> coderService.generatePoetryPrank(prankRequestBody)?.toDto(prankRequestBody.type)
             PrankType.TRANSLATE -> coderService.generateTranslationPrank(prankRequestBody)?.toDto(prankRequestBody.type)
         } ?: PipPrankResponseDto(prankRequestBody.reason, prankRequestBody.type, "")
+    }
+
+    fun requestPasteReview(pasteRequestBody: PipPasteBody): PipResponse {
+        return coderService.reviewPastedCode(pasteRequestBody)?.toResponse() ?: PipResponse.FAIL_RESPONSE
     }
 
     private fun codingRequest(request: PipRequestBody): PipResponse {

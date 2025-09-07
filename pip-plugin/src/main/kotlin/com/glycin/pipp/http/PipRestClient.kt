@@ -73,6 +73,17 @@ object PipRestClient {
         else null
     }
 
+    suspend fun doPasteReview(pipPasteBody: PipPasteBody): PipResponse? {
+        val response = client.post("$baseUrl/pip/paste") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(pipPasteBody)
+        }
+
+        return if(response.status == HttpStatusCode.OK) response.body()
+        else null
+    }
+
     suspend fun doCodeQuestion(codeRequest: PipRequestBody): PipResponse? {
         val response = client.post("$baseUrl/code/generate") {
             contentType(ContentType.Application.Json)
