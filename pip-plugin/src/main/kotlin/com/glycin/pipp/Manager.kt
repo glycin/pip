@@ -131,7 +131,7 @@ class Manager(
                     when(it.category) {
                         RequestCategory.JUST_CHATTING -> handleChattingRequest(requestBody, it, responseHandler)
                         RequestCategory.CODING -> handleCodingRequest(requestBody, it, responseHandler)
-                        RequestCategory.GAMES ->  { }
+                        RequestCategory.GAMES ->  handleGamingRequest(requestBody, it, responseHandler)
                         RequestCategory.MUSIC -> handleMusicRequest(requestBody, it, responseHandler)
                         RequestCategory.BUTLER -> handleButlerRequest(requestBody, it, responseHandler)
                     }
@@ -240,6 +240,15 @@ class Manager(
             pipRequestBody = requestBody.addCategory(categorizationDto)
         )?.also { response ->
             responseHandler.processChatResponse(response)
+        }
+    }
+
+    private suspend fun handleGamingRequest(requestBody: PipRequestBody, categorizationDto: CategorizationDto, responseHandler: PipResponseHandler) {
+        pip.changeStateTo(PipState.YOYO)
+        PipRestClient.doQuestion(
+            pipRequestBody = requestBody.addCategory(categorizationDto)
+        )?.also { response ->
+            responseHandler.processGamingResponse(response)
         }
     }
 

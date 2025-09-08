@@ -4,6 +4,7 @@ data class PipResponse(
     val response: String,
     val prankType: String?,
     val memeFileName: String?,
+    val gameName: String?,
     val code: List<CodeSnippets>?,
 )
 

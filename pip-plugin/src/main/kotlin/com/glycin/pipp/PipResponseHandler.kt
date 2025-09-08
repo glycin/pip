@@ -91,6 +91,18 @@ class PipResponseHandler(
         }
     }
 
+    fun processGamingResponse(pipResponse: PipResponse) {
+        if(pipResponse.gameName == null) {
+            return
+        }
+
+        when(pipResponse.gameName) {
+            "PONG" -> {}
+            "TIC-TAC-TOE" -> {}
+            else -> {}
+        }
+    }
+
     private fun processAcceptedCoding(response: PipResponse) {
         val codeFragments = response.code ?: emptyList()
         val cache = PsiShortNamesCache.getInstance(project)
