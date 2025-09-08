@@ -54,4 +54,24 @@ class ChatterService(
                 ?.let { ChatterResponse(it.withoutThinkTags(), null) }
         }
     }
+
+    fun game(request: PipRequestBody): GamerResponse? {
+        val response = with(request) {
+            pipChatter
+                .prompt(Prompt("""
+                    $input
+                """.trimIndent()))
+                .system("${ChatterPrompts.GAMER_PROMPT} ${if(think)"/think" else "/no_think"}")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
+                .call()
+                .content()
+        }
+
+        return response?.let {
+            val raw = it.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<GamerResponse>(raw) { e ->
+                LOG.error { "Could not parse gamer response $raw because ${e.message} " }
+            }
+        }
+    }
 }

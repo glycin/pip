@@ -2,6 +2,7 @@ package com.glycin.pipserver
 
 import com.glycin.pipserver.chatter.ChatterResponse
 import com.glycin.pipserver.chatter.ChatterService
+import com.glycin.pipserver.chatter.GamerResponse
 import com.glycin.pipserver.coder.CoderResponse
 import com.glycin.pipserver.coder.CoderService
 import com.glycin.pipserver.coder.PrankerResponse
@@ -37,8 +38,9 @@ class PipService(
             when(category.uppercase()) {
                 "CODING" -> codingRequest(request)
                 "JUST_CHATTING" -> chattingRequest(request)
-                "GAMES" -> PipResponse.UNSUPPORTED_RESPONSE //TODO: Add playing games
+                "GAMES" -> gamingRequest(request)
                 "MUSIC" -> musicRequest(request)
+                "BUTLER" -> PipResponse.UNSUPPORTED_RESPONSE //TODO: Add simple tasks
                 else -> PipResponse.UNKNOWN_RESPONSE
             }
         } ?: PipResponse.FAIL_RESPONSE
@@ -90,10 +92,15 @@ class PipService(
         return chatService.chat(request)?.toResponse() ?: PipResponse.FAIL_RESPONSE
     }
 
+    private fun gamingRequest(request: PipRequestBody): PipResponse {
+        return chatService.game(request)?.toResponse() ?: PipResponse.FAIL_RESPONSE
+    }
+
     private fun ChatterResponse.toResponse() = PipResponse(
         response = response,
         prankType = null,
         memeFileName = memeFileName,
+        gameName = null,
         code = null,
     )
 
@@ -101,6 +108,7 @@ class PipService(
         response = response,
         prankType = prankType.name,
         memeFileName = memeFileName,
+        gameName = null,
         code = null,
     )
 
@@ -108,7 +116,16 @@ class PipService(
         response = response,
         prankType = null,
         memeFileName = null,
+        gameName = null,
         code = codeSnippets.map { it.toDto() }
+    )
+
+    private fun GamerResponse.toResponse() = PipResponse(
+        response = response,
+        prankType = null,
+        memeFileName = null,
+        gameName = gameName,
+        code = null,
     )
 
     private fun PrankerResponse.toDto(prankType: PrankType) = PipPrankResponseDto(

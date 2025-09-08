@@ -4,6 +4,7 @@ data class PipResponse (
     val response: String,
     val prankType: String?,
     val memeFileName: String?,
+    val gameName: String?,
     val code: List<CodeFragmentDto>?,
 ) {
     companion object {
@@ -11,6 +12,7 @@ data class PipResponse (
             response = "I'm sleeping now, leave me alone.",
             prankType = null,
             memeFileName = null,
+            gameName = null,
             code = null,
         )
 
@@ -18,6 +20,7 @@ data class PipResponse (
             response = "I can't help you with that.",
             prankType = null,
             memeFileName = null,
+            gameName = null,
             code = null,
         )
 
@@ -25,6 +28,7 @@ data class PipResponse (
             response = "I have no idea what you are asking of me...",
             prankType = null,
             memeFileName = null,
+            gameName = null,
             code = null,
         )
     }
