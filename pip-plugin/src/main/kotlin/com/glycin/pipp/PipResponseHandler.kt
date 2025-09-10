@@ -6,6 +6,7 @@ import com.glycin.pipp.http.PipPrankRequestBody
 import com.glycin.pipp.http.PipResponse
 import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.http.PrankType
+import com.glycin.pipp.pong.PongGame
 import com.glycin.pipp.settings.PipSettings
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
@@ -97,9 +98,22 @@ class PipResponseHandler(
         }
 
         when(pipResponse.gameName) {
-            "PONG" -> {}
+            "PONG" -> {
+                scope.launch(Dispatchers.Default) {
+                    pip.changeStateTo(PipState.TALKING)
+                    agentComponent.showSpeechBubble(pipResponse.response)
+                    delay(3000)
+                    pip.moveTo(Vec2(maxX - (maxX / 3f), pip.position.y), 1500, endAnimationState = PipState.YOYO) // TODO: Make ping ping animation
+                    delay(2000)
+                    PongGame(project, editor, scope) {
+                        pip.moveTo(Vec2(maxX, maxY), 1500)
+                    }.initGame()
+                }
+            }
             "TIC-TAC-TOE" -> {}
-            else -> {}
+            else -> {
+                pip.changeStateTo(PipState.YOYO)
+            }
         }
     }
 

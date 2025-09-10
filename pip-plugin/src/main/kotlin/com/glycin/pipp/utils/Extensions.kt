@@ -1,5 +1,6 @@
 package com.glycin.pipp.utils
 
+import com.glycin.pipp.Vec2
 import com.glycin.pipp.context.JavaSelection
 import com.glycin.pipp.http.CategorizationDto
 import com.glycin.pipp.http.PipRequestBody
@@ -11,6 +12,7 @@ import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.ui.JBColor
 import java.awt.Color
+import java.awt.Point
 
 object Extensions {
 
@@ -83,4 +85,7 @@ object Extensions {
 
         JavaSelection(methods.toList(), classes.toList(), selectedText)
     }
+
+    fun Point.toVec2() = Vec2(x.toFloat(), y.toFloat())
+    fun Point.toVec2(scrollOffset: Int) = Vec2(x.toFloat(), y.toFloat() + scrollOffset)
 }

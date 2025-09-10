@@ -8,6 +8,7 @@ import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.http.RequestCategory
 import com.glycin.pipp.paste.PasteHandler
 import com.glycin.pipp.paste.PipPasteResponseHandler
+import com.glycin.pipp.pong.PongGame
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
 import com.glycin.pipp.ui.IntroComponent
@@ -96,7 +97,7 @@ class Manager(
             pip.position = Vec2(maxX, maxY)
         }
         attachPasteHandler()
-        //introComponent.showIntro()
+        //introComponent.showIntro() //TODO: SHow intro
     }
 
     fun showInput() {
