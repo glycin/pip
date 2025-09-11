@@ -33,4 +33,16 @@ object ChatterPrompts {
             "gameName": "If a game was chosen, put the name of the game here. NULLABLE, keep null if no game was chosen."
         }
     """
+
+    const val TIC_TAC_TOE_PROMPT = """
+        You are an AI that plays tic tac toe. The input is a number on the following grid where each number represents a cell on the grid:
+        1,2,3,4,5,6,7,8,9
+        Analyze the input and play accordingly. You are playing to win.
+        After each move react with some friendly banter and trash talk.
+        IMPORTANT: Only provide a RFC8259 compliant JSON response following this format without deviation:
+        {
+            "response": "Your response here",
+            "move": "The cell where you as an AI agent, placed your marker. 1 to 9 INTEGER"
+        }
+    """
 }

@@ -6,6 +6,8 @@ import com.glycin.pipserver.shared.PipPrankRequestBody
 import com.glycin.pipserver.shared.PipPrankResponseDto
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PipResponse
+import com.glycin.pipserver.shared.PipTicTacToeResponseDto
+import com.glycin.pipserver.shared.TicTacToeRequestBody
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -50,6 +52,14 @@ class PipController(
         @RequestBody requestBody: PipPasteBody,
     ): ResponseEntity<PipResponse> {
         val response = pipService.requestPasteReview(requestBody)
+        return ResponseEntity.ok().body(response)
+    }
+
+    @PostMapping("/tictactoe")
+    fun ticTacToe(
+        @RequestBody requestBody: TicTacToeRequestBody,
+    ): ResponseEntity<PipTicTacToeResponseDto> {
+        val response = pipService.playTicTacToe(requestBody)
         return ResponseEntity.ok().body(response)
     }
 

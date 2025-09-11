@@ -13,7 +13,9 @@ import com.glycin.pipserver.shared.PipPrankRequestBody
 import com.glycin.pipserver.shared.PipPrankResponseDto
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PipResponse
+import com.glycin.pipserver.shared.PipTicTacToeResponseDto
 import com.glycin.pipserver.shared.PrankType
+import com.glycin.pipserver.shared.TicTacToeRequestBody
 import com.glycin.pipserver.shared.TrollAgentResponseDto
 import com.glycin.pipserver.shared.toDto
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -57,6 +59,10 @@ class PipService(
 
     fun requestPasteReview(pasteRequestBody: PipPasteBody): PipResponse {
         return coderService.reviewPastedCode(pasteRequestBody)?.toResponse() ?: PipResponse.FAIL_RESPONSE
+    }
+
+    fun playTicTacToe(requestBody: TicTacToeRequestBody): PipTicTacToeResponseDto {
+        return chatService.ticTacToe(requestBody)?.toDto() ?: PipTicTacToeResponseDto.FAIL_RESPONSE
     }
 
     private fun codingRequest(request: PipRequestBody): PipResponse {

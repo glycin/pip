@@ -3,6 +3,7 @@ package com.glycin.pipserver.chatter
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.shared.PipRequestBody
+import com.glycin.pipserver.shared.TicTacToeRequestBody
 import com.glycin.pipserver.util.parseToStructuredOutput
 import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -17,6 +18,7 @@ private val LOG = KotlinLogging.logger {}
 @Service
 class ChatterService(
     @param:Qualifier("pip") private val pipChatter: ChatClient,
+    @param:Qualifier("pip_toolless") private val pipToolless: ChatClient,
     @param:Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
 ) {
 
@@ -71,6 +73,29 @@ class ChatterService(
             val raw = it.withoutThinkTags()
             objectMapper.parseToStructuredOutput<GamerResponse>(raw) { e ->
                 LOG.error { "Could not parse gamer response $raw because ${e.message} " }
+            }
+        }
+    }
+
+    fun ticTacToe(request: TicTacToeRequestBody): TicTacToeResponse? {
+        LOG.info { "Playing tic tac toe: User placed on ${request.playerMoves}" }
+        val response = with(request) {
+            pipToolless
+                .prompt(Prompt("""
+                    The user placed an X marker on the following cells: ${request.playerMoves}.
+                    You have placed a marker on the following cells: ${request.aiMoves}.
+                    What is your next move?
+                """.trimIndent()))
+                .system("${ChatterPrompts.TIC_TAC_TOE_PROMPT} ${if(think)"/think" else "/no_think"}")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
+                .call()
+                .content()
+        }
+
+        return response?.let {
+            val raw = it.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<TicTacToeResponse>(raw) { e ->
+                LOG.error { "Could not parse tic tac toe response $raw because ${e.message} " }
             }
         }
     }

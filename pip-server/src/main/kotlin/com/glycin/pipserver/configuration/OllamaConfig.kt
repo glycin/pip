@@ -42,4 +42,14 @@ class OllamaConfig(
             )
             .build()
     }
+
+    @Bean("pip_toolless")
+    fun pipToollessClient(): ChatClient {
+        return ChatClient.builder(ollama)
+            .defaultAdvisors(
+                SimpleLoggerAdvisor(),
+                MessageChatMemoryAdvisor.builder(chatMemory).build(),
+            )
+            .build()
+    }
 }
