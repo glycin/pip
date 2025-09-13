@@ -8,10 +8,9 @@ import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.http.RequestCategory
 import com.glycin.pipp.paste.PasteHandler
 import com.glycin.pipp.paste.PipPasteResponseHandler
-import com.glycin.pipp.pong.PongGame
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
-import com.glycin.pipp.ui.IntroComponent
+import com.glycin.pipp.tictactoe.TicTacToeStarter
 import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.Extensions.addCategory
 import com.glycin.pipp.utils.Extensions.fqMethodName
@@ -34,6 +33,7 @@ import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
 import java.io.File
 import javax.swing.JComponent
+
 
 private const val FPS = 120L
 private const val MARGIN_X = 5f
@@ -64,13 +64,13 @@ class Manager(
     private var maxY : Float = 0.0f
 
     init {
-        val introComponent = IntroComponent(scope).also {
+        /*val introComponent = IntroComponent(scope).also {
             it.bounds = contentComponent.bounds
             it.isOpaque = false
-        }
+        }*/
         contentComponent.let {
             it.add(agentComponent)
-            it.add(introComponent)
+            //it.add(introComponent)
             it.revalidate()
             it.repaint()
             it.addComponentListener(object : ComponentListener {

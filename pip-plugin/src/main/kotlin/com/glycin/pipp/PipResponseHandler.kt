@@ -8,6 +8,8 @@ import com.glycin.pipp.http.PipRestClient
 import com.glycin.pipp.http.PrankType
 import com.glycin.pipp.pong.PongGame
 import com.glycin.pipp.settings.PipSettings
+import com.glycin.pipp.tictactoe.TicTacToeComponent
+import com.glycin.pipp.tictactoe.TicTacToeStarter
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
 import com.glycin.pipp.utils.showPngInPopup
@@ -93,9 +95,6 @@ class PipResponseHandler(
     }
 
     fun processGamingResponse(pipResponse: PipResponse) {
-        if(pipResponse.gameName == null) {
-            return
-        }
 
         when(pipResponse.gameName) {
             "PONG" -> {
@@ -103,16 +102,34 @@ class PipResponseHandler(
                     pip.changeStateTo(PipState.TALKING)
                     agentComponent.showSpeechBubble(pipResponse.response)
                     delay(3000)
-                    pip.moveTo(Vec2(maxX - (maxX / 3f), pip.position.y), 1500, endAnimationState = PipState.YOYO) // TODO: Make ping ping animation
+                    pip.moveTo(Vec2(maxX - (maxX / 3f), pip.position.y), 1500, endAnimationState = PipState.YOYO) // TODO: Make ping pong animation
                     delay(2000)
                     PongGame(project, editor, scope) {
                         pip.moveTo(Vec2(maxX, maxY), 1500)
                     }.initGame()
                 }
             }
-            "TIC-TAC-TOE" -> {}
+            "TIC-TAC-TOE" -> {
+                scope.launch(Dispatchers.Default) {
+                    agentComponent.showSpeechBubble(pipResponse.response)
+                    delay(10_000)
+                    agentComponent.hideSpeechBubble(false)
+                    pip.changeStateTo(PipState.YOYO)
+                    TicTacToeStarter(
+                        scope = scope,
+                        chatId = NanoId.generate(),
+                        pip = pip,
+                        agentComponent = agentComponent
+                    ).showTicTacToe()
+                }
+            }
             else -> {
-                pip.changeStateTo(PipState.YOYO)
+                scope.launch(Dispatchers.Default) {
+                    pip.changeStateTo(PipState.YOYO)
+                    agentComponent.showSpeechBubble(pipResponse.response)
+                    delay(15_000)
+                    agentComponent.hideSpeechBubble()
+                }
             }
         }
     }

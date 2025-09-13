@@ -84,6 +84,17 @@ object PipRestClient {
         else null
     }
 
+    suspend fun doTicTacToe(ticTacToeRequestBody: TicTacToeRequestBody): TicTacToeResponse? {
+        val response = client.post("$baseUrl/pip/tictactoe") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(ticTacToeRequestBody)
+        }
+
+        return if(response.status == HttpStatusCode.OK) response.body()
+        else null
+    }
+
     suspend fun doCodeQuestion(codeRequest: PipRequestBody): PipResponse? {
         val response = client.post("$baseUrl/code/generate") {
             contentType(ContentType.Application.Json)
