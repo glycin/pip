@@ -13,5 +13,4 @@ object Gifs {
         val url = checkNotNull(Gifs::class.java.getResource("/art/gifs/matrix-effect.gif"))
         ImageIcon(url)
     }
-
 }

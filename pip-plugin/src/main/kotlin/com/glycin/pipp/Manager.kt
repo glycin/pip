@@ -11,6 +11,7 @@ import com.glycin.pipp.paste.PipPasteResponseHandler
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
 import com.glycin.pipp.tictactoe.TicTacToeStarter
+import com.glycin.pipp.ui.DvdComponent
 import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.Extensions.addCategory
 import com.glycin.pipp.utils.Extensions.fqMethodName
@@ -68,6 +69,7 @@ class Manager(
             it.bounds = contentComponent.bounds
             it.isOpaque = false
         }*/
+
         contentComponent.let {
             it.add(agentComponent)
             //it.add(introComponent)
@@ -86,6 +88,11 @@ class Manager(
 
         scope.launch(Dispatchers.EDT) {
             val visibleArea = scrollModel?.visibleArea!!
+            val dvdComponent = DvdComponent(visibleArea.width,visibleArea.height,scope, FPS).also {
+                it.bounds = contentComponent.bounds
+                it.isOpaque = false
+            }
+            contentComponent.add(dvdComponent)
             scrollModel.addVisibleAreaListener {
                 maxX = (it.newRectangle.width - pip.width - MARGIN_X) + it.newRectangle.x
                 maxY = (it.newRectangle.height - pip.height + MARGIN_Y) + it.newRectangle.y
