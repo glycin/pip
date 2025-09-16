@@ -5,5 +5,6 @@ enum class RequestCategory {
     CODING,
     GAMES,
     MUSIC,
-    BUTLER
+    BUTLER,
+    STUCK,
 }

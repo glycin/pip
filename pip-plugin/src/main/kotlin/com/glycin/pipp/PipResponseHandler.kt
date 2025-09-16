@@ -10,6 +10,7 @@ import com.glycin.pipp.pong.PongGame
 import com.glycin.pipp.settings.PipSettings
 import com.glycin.pipp.tictactoe.TicTacToeComponent
 import com.glycin.pipp.tictactoe.TicTacToeStarter
+import com.glycin.pipp.ui.DvdComponent
 import com.glycin.pipp.utils.NanoId
 import com.glycin.pipp.utils.TextWriter
 import com.glycin.pipp.utils.showPngInPopup
@@ -18,6 +19,7 @@ import com.intellij.openapi.application.readAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.ScrollingModel
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.search.GlobalSearchScope
@@ -29,6 +31,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.awt.Point
+import javax.swing.JComponent
 import kotlin.math.max
 import kotlin.math.min
 
@@ -95,6 +98,7 @@ class PipResponseHandler(
     }
 
     fun processGamingResponse(pipResponse: PipResponse) {
+        pipResponse.showMeme()
 
         when(pipResponse.gameName) {
             "PONG" -> {
@@ -131,6 +135,39 @@ class PipResponseHandler(
                     agentComponent.hideSpeechBubble()
                 }
             }
+        }
+    }
+
+    fun processStuckResponse(pipResponse: PipResponse, contentComponent: JComponent, scrollModel: ScrollingModel?, fps: Long) {
+        if(pipResponse.isFailResponse()) {
+            processFailResponse()
+            return
+        }
+
+        scope.launch(Dispatchers.EDT) {
+            pipResponse.showMeme()
+            delay(1000)
+            agentComponent.showSpeechBubble(pipResponse.response)
+            delay(5_000)
+
+            if(scrollModel != null) {
+                val visibleArea = scrollModel.visibleArea
+                val dvdComponent = DvdComponent(visibleArea.width, visibleArea.height, scope, fps) {
+                    contentComponent.remove(it)
+                    contentComponent.repaint()
+                    contentComponent.revalidate()
+                    pip.changeStateTo(PipState.IDLE)
+                }.also {
+                    it.bounds = visibleArea
+                    it.isOpaque = false
+                }
+                contentComponent.add(dvdComponent)
+                contentComponent.repaint()
+                contentComponent.revalidate()
+            }
+            delay(10_000)
+            agentComponent.hideSpeechBubble()
+            pip.changeStateTo(PipState.SLEEPING)
         }
     }
 

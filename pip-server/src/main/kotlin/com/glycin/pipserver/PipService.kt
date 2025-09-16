@@ -43,6 +43,7 @@ class PipService(
                 "GAMES" -> gamingRequest(request)
                 "MUSIC" -> musicRequest(request)
                 "BUTLER" -> PipResponse.UNSUPPORTED_RESPONSE //TODO: Add simple tasks
+                "STUCK" -> stuckRequest(request)
                 else -> PipResponse.UNKNOWN_RESPONSE
             }
         } ?: PipResponse.FAIL_RESPONSE
@@ -95,11 +96,15 @@ class PipService(
     }
 
     private fun musicRequest(request: PipRequestBody): PipResponse {
-        return chatService.chat(request)?.toResponse() ?: PipResponse.FAIL_RESPONSE
+        return chatService.chatMusic(request)?.toResponse() ?: PipResponse.FAIL_RESPONSE
     }
 
     private fun gamingRequest(request: PipRequestBody): PipResponse {
         return chatService.game(request)?.toResponse() ?: PipResponse.FAIL_RESPONSE
+    }
+
+    private fun stuckRequest(requestBody: PipRequestBody): PipResponse {
+        return chatService.chatStuck(requestBody)?.toResponse() ?: PipResponse.FAIL_RESPONSE
     }
 
     private fun ChatterResponse.toResponse() = PipResponse(

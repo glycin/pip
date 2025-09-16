@@ -9,16 +9,20 @@ import kotlinx.coroutines.launch
 import java.awt.Graphics
 import java.awt.Graphics2D
 import java.awt.Color
+import java.awt.event.ActionEvent
+import java.awt.event.KeyEvent
 import java.awt.image.BufferedImage
+import javax.swing.AbstractAction
 import javax.swing.JComponent
+import javax.swing.KeyStroke
 import kotlin.math.roundToInt
-
 
 class DvdComponent(
     private val maxX: Int,
     private val maxY: Int,
     private val scope: CoroutineScope,
     fps: Long,
+    private val onExit: (DvdComponent) -> Unit,
 ): JComponent() {
 
     private val deltaTime = 1000L / fps
@@ -34,6 +38,7 @@ class DvdComponent(
 
     init{
         dvdIcon.recolor()
+        setupEscapeKeyBinding()
         moveIcon()
     }
 
@@ -62,6 +67,27 @@ class DvdComponent(
                 delay(deltaTime)
             }
         }
+    }
+
+    private fun setupEscapeKeyBinding() {
+        val inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW)
+        val escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)
+
+        inputMap.put(escapeStroke, "escape")
+        actionMap.put("escape", object : AbstractAction() {
+            override fun actionPerformed(e: ActionEvent?) {
+                handleEscapeKey()
+            }
+        })
+    }
+
+    private fun handleEscapeKey() {
+        println("ESC key pressed!")
+        active = false
+        val inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW)
+        inputMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0))
+        actionMap.remove("escape")
+        onExit(this)
     }
 }
 

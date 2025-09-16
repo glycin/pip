@@ -43,7 +43,7 @@ class ChatterService(
         }
     }
 
-    fun chat(request: PipRequestBody): ChatterResponse? {
+    fun chatMusic(request: PipRequestBody): ChatterResponse? {
         return with(request) {
             pipChatter
                 .prompt(Prompt("""
@@ -96,6 +96,28 @@ class ChatterService(
             val raw = it.withoutThinkTags()
             objectMapper.parseToStructuredOutput<TicTacToeResponse>(raw) { e ->
                 LOG.error { "Could not parse tic tac toe response $raw because ${e.message} " }
+            }
+        }
+    }
+
+    fun chatStuck(request: PipRequestBody): ChatterResponse? {
+        LOG.info { "Helping the user with their little stuck problem." }
+        val response = with(request) {
+            pipChatter
+                .prompt(Prompt("""
+                    The user is stuck because ${request.categoryReason}.
+                    Respond with telling the user that you will hypnotize them using some next level hypnosis tactics.
+                """.trimIndent()))
+                .system("${ChatterPrompts.CHATTER_GENERIC_PROMPT} ${if(think)"/think" else "/no_think"}")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
+                .call()
+                .content()
+        }
+
+        return response?.let {
+            val raw = it.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<ChatterResponse>(raw) { e ->
+                LOG.error { "Could not parse $raw because ${e.message} " }
             }
         }
     }

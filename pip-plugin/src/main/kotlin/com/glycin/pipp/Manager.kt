@@ -10,8 +10,6 @@ import com.glycin.pipp.paste.PasteHandler
 import com.glycin.pipp.paste.PipPasteResponseHandler
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
-import com.glycin.pipp.tictactoe.TicTacToeStarter
-import com.glycin.pipp.ui.DvdComponent
 import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.Extensions.addCategory
 import com.glycin.pipp.utils.Extensions.fqMethodName
@@ -88,11 +86,7 @@ class Manager(
 
         scope.launch(Dispatchers.EDT) {
             val visibleArea = scrollModel?.visibleArea!!
-            val dvdComponent = DvdComponent(visibleArea.width,visibleArea.height,scope, FPS).also {
-                it.bounds = contentComponent.bounds
-                it.isOpaque = false
-            }
-            contentComponent.add(dvdComponent)
+
             scrollModel.addVisibleAreaListener {
                 maxX = (it.newRectangle.width - pip.width - MARGIN_X) + it.newRectangle.x
                 maxY = (it.newRectangle.height - pip.height + MARGIN_Y) + it.newRectangle.y
@@ -142,6 +136,7 @@ class Manager(
                         RequestCategory.GAMES ->  handleGamingRequest(requestBody, it, responseHandler)
                         RequestCategory.MUSIC -> handleMusicRequest(requestBody, it, responseHandler)
                         RequestCategory.BUTLER -> handleButlerRequest(requestBody, it, responseHandler)
+                        RequestCategory.STUCK -> handleStuckRequest(requestBody, it, responseHandler)
                     }
                 }
             }
@@ -257,6 +252,15 @@ class Manager(
             pipRequestBody = requestBody.addCategory(categorizationDto)
         )?.also { response ->
             responseHandler.processGamingResponse(response)
+        }
+    }
+
+    private suspend fun handleStuckRequest(requestBody: PipRequestBody, categorizationDto: CategorizationDto, responseHandler: PipResponseHandler) {
+        pip.changeStateTo(PipState.THINKING)
+        PipRestClient.doQuestion(
+            pipRequestBody = requestBody.addCategory(categorizationDto)
+        )?.also { response ->
+            responseHandler.processStuckResponse(response, contentComponent, scrollModel, FPS)
         }
     }
 
