@@ -25,6 +25,18 @@ class CoderController(
             ResponseEntity.ok().body(response)
     }
 
+    @PostMapping("/autocomplete")
+    fun generateAutoComplete(
+        @RequestBody request: AutocompleteRequest
+    ): ResponseEntity<AutocompleteResponse> {
+        val response = coderService.autocomplete(request)
+        return if(response == null) {
+            ResponseEntity.noContent().build()
+        } else {
+            ResponseEntity.ok(response)
+        }
+    }
+
     @PostMapping("/generate/stream", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun generateStream(
         @RequestBody codingRequest: PipRequestBody,

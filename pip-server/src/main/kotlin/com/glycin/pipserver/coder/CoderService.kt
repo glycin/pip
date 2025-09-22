@@ -131,6 +131,33 @@ class CoderService(
         }
     }
 
+    fun autocomplete(request: AutocompleteRequest): AutocompleteResponse? {
+        LOG.info { "Autocompleting text: ${request.singleLineText}" }
+        val additionalContext = qdrantService.search(request.singleLineText, "Riccardo")
+            .mapNotNull { t ->
+                t.takeUnless { it.text.isEmpty() }
+            }
+            .joinToString { it.text }
+
+        val response = pipCoder
+            .prompt(Prompt("""
+                    Critique the following text:
+                    ${request.singleLineText}
+                    ${if(additionalContext.isEmpty()) "" else "Here some additional context that has been has been found in a chat log that could be relevant to this matter: $additionalContext. Use only if relevant." }
+                """.trimIndent()))
+            .system("${CoderPrompts.AUTO_COMPLETE_SYSTEM_PROMPT} /no_think")
+            .advisors { it.param(ChatMemory.CONVERSATION_ID, NanoId.generate()) }
+            .call()
+            .content()
+
+        return response?.let { raw ->
+            val rawWithoutThink = raw.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<AutocompleteResponse>(rawWithoutThink) { e ->
+                LOG.info { "Could not parse $rawWithoutThink because ${e.message}" }
+            }
+        }
+    }
+
     private fun generatePrank(pipPrankRequestBody: PipPrankRequestBody, prankedCode: String): PrankerResponse? {
         LOG.info { "Generating prank ${pipPrankRequestBody.type}" }
         val additionalContext = qdrantService.search(pipPrankRequestBody.reason, null)

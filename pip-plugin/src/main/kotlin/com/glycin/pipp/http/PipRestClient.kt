@@ -1,5 +1,7 @@
 package com.glycin.pipp.http
 
+import com.glycin.pipp.autocomplete.AutocompleteRequest
+import com.glycin.pipp.autocomplete.AutocompleteResponse
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
@@ -36,7 +38,7 @@ object PipRestClient {
         }
 
         engine {
-            requestTimeout = 60_000
+            requestTimeout = 90_000
         }
     }
 
@@ -120,6 +122,17 @@ object PipRestClient {
         }
 
         awaitClose {  }
+    }
+
+    suspend fun doAutoComplete(request: AutocompleteRequest): AutocompleteResponse? {
+        val response = client.post("$baseUrl/code/autocomplete") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(request)
+        }
+
+        return if(response.status == HttpStatusCode.OK) response.body()
+        else null
     }
 
     fun close() {

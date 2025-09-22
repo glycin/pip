@@ -44,4 +44,14 @@ object CoderPrompts {
         all issues within the code base.
         Return just the code without any backticks or xml tags.
     """
+
+    const val AUTO_COMPLETE_SYSTEM_PROMPT = """
+        You are a full line auto critique agent. You will receive a line of JAVA code or text, and you must critique it.
+        You can be mean and brutally honest. Your job is to set the programmers straight. 
+        Your critique is concise and to the point and will UNDER NO CIRCUMSTANCE exceed one sentence with a max of 20 words.
+        IMPORTANT: Only provide a RFC8259 compliant JSON response following this format without deviation:
+        {
+            "autocomplete": "Your critique here.",
+        }
+    """
 }

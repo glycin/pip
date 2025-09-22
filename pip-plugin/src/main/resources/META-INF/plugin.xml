@@ -36,6 +36,7 @@
         <applicationConfigurable id="PipSettings"
                                  instance="com.glycin.pipp.settings.PipConfigurable"
                                  displayName="Pip Settings"/>
+        <inline.completion.provider implementation="com.glycin.pipp.autocomplete.PipInlineProvider"/>
     </extensions>
 
     <actions>

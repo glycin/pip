@@ -14,6 +14,7 @@ class PipConfigurable: SearchableConfigurable {
     private var panel: JPanel? = null
     private var pathField: TextFieldWithBrowseButton? = null
     private var memeFolderField: TextFieldWithBrowseButton? = null
+    private var autoCritiqueToggle: JCheckBox? = null
     private val settings = ApplicationManager.getApplication().getService(PipSettings::class.java)
 
     override fun createComponent(): JComponent? {
@@ -31,8 +32,7 @@ class PipConfigurable: SearchableConfigurable {
             add(titleLabel, gbc)
 
             gbc.gridy = 1
-            val separator = JSeparator()
-            add(separator, gbc)
+            add(JSeparator(), gbc)
 
             gbc.gridy = 2
             gbc.fill = GridBagConstraints.NONE
@@ -54,8 +54,7 @@ class PipConfigurable: SearchableConfigurable {
             add(pathField!!, gbc)
 
             gbc.gridy = 4
-            val s2 = JSeparator()
-            add(s2, gbc)
+            add(JSeparator(), gbc)
 
             gbc.gridy = 5
             gbc.fill = GridBagConstraints.NONE
@@ -76,8 +75,19 @@ class PipConfigurable: SearchableConfigurable {
             }
             add(memeFolderField!!, gbc)
             gbc.gridy = 7
-            val s3 = JSeparator()
-            add(s3, gbc)
+            add(JSeparator(), gbc)
+
+            gbc.gridy = 8
+            autoCritiqueToggle = JCheckBox("Enable Full Line AutoCritiqueTM").apply {
+                isSelected = settings.state.enableAutoCritique
+                addActionListener {
+                    settings.state.enableAutoCritique = isSelected
+                    println("${settings.state.enableAutoCritique} vs $isSelected")
+                }
+            }
+            add(autoCritiqueToggle, gbc)
+            gbc.gridy = 9
+            add(JSeparator(), gbc)
 
             gbc.weighty = 1.0
             add(Box.createVerticalGlue(), gbc)
@@ -88,18 +98,17 @@ class PipConfigurable: SearchableConfigurable {
 
     override fun isModified(): Boolean {
        return pathField?.text != settings.state.jsonExportPath ||
-       memeFolderField?.text != settings.state.memeSaveFolder
+       memeFolderField?.text != settings.state.memeSaveFolder ||
+               autoCritiqueToggle?.isSelected != settings.state.enableAutoCritique
     }
 
     override fun apply() {
         settings.state.jsonExportPath = pathField?.text ?: ""
         settings.state.memeSaveFolder = memeFolderField?.text ?: ""
+        settings.state.enableAutoCritique = autoCritiqueToggle?.isSelected ?: false
     }
 
-    override fun reset() {
-        pathField?.text = ""
-        memeFolderField?.text = ""
-    }
+    override fun reset() {}
 
     override fun getDisplayName(): String = "Settings For P.I.P"
 
