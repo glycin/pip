@@ -24,58 +24,52 @@ class MemeService(
 
     private val log = LoggerFactory.getLogger(SpotifyService::class.java)
 
-    @Tool(description = "Generate the 'one does not simply' meme. Use when you need a meme to indicate the user is wants to do something very hard.")
+    @Tool(description = "Generate the 'one does not simply' meme. Use when you need a meme to indicate what the user wants to do is very hard.")
     fun memeNotSimply(
-        @ToolParam(description = "The top text for the meme") topText: String,
-        @ToolParam(description = "The bottom text for the meme") bottomText: String,
+        @ToolParam(description = "The bottom text for the meme. For example something like 'Write code in rust.'") bottomText: String,
     ): String {
-        log.info("GENERATE ONE DOES NOT SIMPLY MEME INVOKED => $topText / $bottomText")
-        return generateMemeBase64("one_does_not_simply.png", topText, bottomText)
+        log.info("GENERATE ONE DOES NOT SIMPLY MEME INVOKED => $bottomText")
+        return generateMemeBase64("one_does_not_simply.png", "One does not simply", bottomText)
     }
 
-    @Tool(description = "Generate the 'ancient aliens' meme. Use when you are paranoid about something.")
+    @Tool(description = "Generate the 'ancient aliens' meme. Use when you want to indicate that something is unexplainable.")
     fun memeAncientAliens(
-        @ToolParam(description = "The top text for the meme") topText: String,
-        @ToolParam(description = "The bottom text for the meme") bottomText: String,
+        @ToolParam(description = "The top text for the meme. For example something like 'Your code when it runs without issues on the first run.'") topText: String,
     ): String {
-        log.info("GENERATE ANCIENT ALIENS MEME INVOKED => $topText / $bottomText")
-        return generateMemeBase64("ancient_aliens.png", topText, bottomText)
+        log.info("GENERATE ANCIENT ALIENS MEME INVOKED => $topText")
+        return generateMemeBase64("ancient_aliens.png", topText, "Aliens")
     }
 
     @Tool(description = "Generate the 'sad pablo escobar' meme. Use when you or the user are waiting for something for a long time.")
     fun memeSadPabloEscobar(
-        @ToolParam(description = "The top text for the meme") topText: String,
-        @ToolParam(description = "The bottom text for the meme") bottomText: String,
+        @ToolParam(description = "The bottom text for the meme. For example something like 'Me waiting for the stand up to finish.'") bottomText: String,
     ): String {
-        log.info("GENERATE SAD PABLO ESCOBAR INVOKED => $topText / $bottomText")
-        return generateMemeBase64("sad_pablo.png", topText, bottomText)
+        log.info("GENERATE SAD PABLO ESCOBAR INVOKED => $bottomText")
+        return generateMemeBase64("sad_pablo.png", " ", bottomText)
     }
 
-    @Tool(description = "Generate the 'hide the pain' meme. Use when you or the user are sad and are trying to hide it.")
+    @Tool(description = "Generate the 'hide the pain' meme. Use when you want to indicate that something is sad and we are trying to hide it.")
     fun memeHideThePain(
-        @ToolParam(description = "The top text for the meme") topText: String,
-        @ToolParam(description = "The bottom text for the meme") bottomText: String,
+        @ToolParam(description = "The top text for the meme. For example something like 'My face when I see a pull request with 5000 changes.'") topText: String,
     ): String {
-        log.info("GENERATE HIDE THE PAIN INVOKED => $topText / $bottomText")
-        return generateMemeBase64("hide_the_pain.png", topText, bottomText)
+        log.info("GENERATE HIDE THE PAIN INVOKED => $topText")
+        return generateMemeBase64("hide_the_pain.png", topText, " ")
     }
 
-    @Tool(description = "Generate the 'roll safe' meme. Use when you want to indicate something clever.")
+    @Tool(description = "Generate the 'roll safe' meme. Use when you want show something clever has happened.")
     fun memeThinkAboutIt(
-        @ToolParam(description = "The top text for the meme") topText: String,
-        @ToolParam(description = "The bottom text for the meme") bottomText: String,
+        @ToolParam(description = "The top text for the meme. For example something like 'You can't be broke if you don't check your bank account.'") topText: String,
     ): String {
-        log.info("GENERATE ROLL SAFE INVOKED => $topText / $bottomText")
-        return generateMemeBase64("roll_safe.jpg", topText, bottomText)
+        log.info("GENERATE ROLL SAFE INVOKED => $topText")
+        return generateMemeBase64("roll_safe.jpg", topText, " ")
     }
 
-    @Tool(description = "Generate the 'challenge accepted' meme. Use when you want to indicate a challenge is being taken on!")
+    @Tool(description = "Generate the 'challenge accepted' meme. Use when you want to indicate something is challenging but that doesn't scare us!")
     fun memeChallengeAccepted(
-        @ToolParam(description = "The top text for the meme") topText: String,
-        @ToolParam(description = "The bottom text for the meme") bottomText: String,
+        @ToolParam(description = "The top text for the meme. For example something like 'Write code without a compiler?'") topText: String,
     ): String {
-        log.info("GENERATE CHALLENGE ACCEPTED INVOKED => $topText / $bottomText")
-        return generateMemeBase64("challenge_accepted.png", topText, bottomText)
+        log.info("GENERATE CHALLENGE ACCEPTED INVOKED => $topText")
+        return generateMemeBase64("challenge_accepted.png", topText, "Challenge Accepted")
     }
 
     private fun generateMemeBase64(templateName: String, topText: String, bottomText: String): String {
