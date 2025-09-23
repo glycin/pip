@@ -9,24 +9,23 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 
 class IntroComponent(
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private val onClose: (IntroComponent) -> Unit,
 ): JComponent(), Disposable {
 
-    private var active = true
     private var matrixGif: JLabel? = null
 
     fun showIntro() {
         isOpaque = false
         scope.launch(Dispatchers.Default) {
-            delay(5000)
+            delay(500)
             addMatrix()
-            delay(15000)
+            delay(5000)
             hideMatrix()
         }
     }
 
     private fun addMatrix() {
-        println("added matrix")
         matrixGif = JLabel(Gifs.MATRIX_GIF).apply {
             setBounds(0, 0, 1920, 1080)
         }
@@ -35,16 +34,18 @@ class IntroComponent(
         repaint()
     }
 
-    fun hideMatrix() {
+    private fun hideMatrix() {
         if(matrixGif == null) return
         remove(matrixGif)
         matrixGif = null
         revalidate()
         repaint()
+        dispose()
+
+        onClose.invoke(this)
     }
 
     override fun dispose() {
         matrixGif = null
-        active = false
     }
 }

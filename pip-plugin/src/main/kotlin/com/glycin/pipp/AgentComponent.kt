@@ -3,6 +3,7 @@ package com.glycin.pipp
 import com.glycin.pipp.ui.Gifs
 import com.glycin.pipp.ui.PipColors
 import com.glycin.pipp.ui.PipSpeechBubble
+import com.glycin.pipp.ui.PortalAnimation
 import com.glycin.pipp.utils.Fonts
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
@@ -30,6 +31,7 @@ class AgentComponent(
     private var speechBubble: PipSpeechBubble? = null
     private var closeButton : JButton? = null
     private var catJamGif: JLabel? = null
+    private var portal: PortalAnimation? = null
 
     init {
         scope.launch(Dispatchers.EDT) {
@@ -45,12 +47,15 @@ class AgentComponent(
         super.paintComponent(g)
         if(g is Graphics2D) {
             pip.render(g)
+            portal?.render(g)
             //drawMovementPoints(g)
         }
     }
 
     override fun dispose() {
         active = false
+        portal?.stop()
+        portal = null
         speechBubble?.deactivate()
         speechBubble?.let {
             hideSpeechBubble()
@@ -122,6 +127,22 @@ class AgentComponent(
         catJamGif = null
         revalidate()
         repaint()
+    }
+
+    fun showPortal(x: Float, y: Float) {
+        if(portal != null) {
+            portal?.visible = true
+        }else {
+            portal = PortalAnimation(
+                position = Vec2(x, y),
+                scope = scope,
+                fps = fps,
+            )
+        }
+    }
+
+    fun hidePortal() {
+        portal?.visible = false
     }
 
     private fun drawMovementPoints(g: Graphics) {

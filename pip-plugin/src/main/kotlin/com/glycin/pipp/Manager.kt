@@ -10,6 +10,7 @@ import com.glycin.pipp.paste.PasteHandler
 import com.glycin.pipp.paste.PipPasteResponseHandler
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
+import com.glycin.pipp.ui.IntroComponent
 import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.Extensions.addCategory
 import com.glycin.pipp.utils.Extensions.fqMethodName
@@ -20,6 +21,7 @@ import com.google.gson.GsonBuilder
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.progress.ProgressManager
@@ -27,11 +29,11 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
 import java.io.File
-import javax.swing.JComponent
 
 
 private const val FPS = 120L
@@ -42,69 +44,50 @@ class Manager(
     private val scope: CoroutineScope,
     private val project: Project,
     private val pipSettings: PipSettings,
+    private var editor: Editor,
 ): Disposable {
 
-    private val editor = FileEditorManager.getInstance(project).selectedTextEditor
-    private val contentComponent = editor?.contentComponent as JComponent
-    private val scrollModel = editor?.scrollingModel
     private val pip = Pip(
-        position = Vec2.zero,
+        position = Vec2(-10000f, -10000f),
         scope = scope
     )
+    private val chatIds = mutableListOf(NanoId.generate())
+
+    private var contentComponent = editor.contentComponent
+    private var scrollModel = editor.scrollingModel
+
     private val agentComponent: AgentComponent = AgentComponent(pip, scope, FPS).also {
         it.bounds = contentComponent.bounds
         it.isOpaque = false
     }
 
-    private val chatIds = mutableListOf(NanoId.generate())
     private lateinit var pasteHandler: PasteHandler
 
     private var maxX : Float = 0.0f
     private var maxY : Float = 0.0f
 
     init {
-        /*val introComponent = IntroComponent(scope).also {
-            it.bounds = contentComponent.bounds
-            it.isOpaque = false
-        }*/
-
-        contentComponent.let {
-            it.add(agentComponent)
-            //it.add(introComponent)
-            it.revalidate()
-            it.repaint()
-            it.addComponentListener(object : ComponentListener {
-                override fun componentResized(e: ComponentEvent?) {
-                    agentComponent.bounds = it.bounds
-                }
-
-                override fun componentMoved(e: ComponentEvent?) {}
-                override fun componentShown(e: ComponentEvent?) {}
-                override fun componentHidden(e: ComponentEvent?) {}
-            })
-        }
-
-        scope.launch(Dispatchers.EDT) {
-            val visibleArea = scrollModel?.visibleArea!!
-
-            scrollModel.addVisibleAreaListener {
-                maxX = (it.newRectangle.width - pip.width - MARGIN_X) + it.newRectangle.x
-                maxY = (it.newRectangle.height - pip.height + MARGIN_Y) + it.newRectangle.y
-                pip.anchor(maxX, maxY)
-            }
-
-            maxX = visibleArea.width - pip.width - MARGIN_X
-            maxY = visibleArea.height - pip.height.toFloat() + MARGIN_Y
-            pip.position = Vec2(maxX, maxY)
-        }
+        initSwingComponents(true)
         attachPasteHandler()
-        //introComponent.showIntro() //TODO: SHow intro
     }
+
+    fun refocusPip(newEditor: Editor) {
+        contentComponent.remove(agentComponent)
+        contentComponent.revalidate()
+        contentComponent.repaint()
+        pip.position = Vec2(-10000f, -10000f)
+        editor = newEditor
+        contentComponent = editor.contentComponent
+        scrollModel = editor.scrollingModel
+
+        initSwingComponents()
+    }
+
 
     fun showInput() {
         val dialog = PipInputDialog(project)
 
-        if(!dialog.showAndGet() || dialog.userInput.isEmpty() || editor == null) {
+        if(!dialog.showAndGet() || dialog.userInput.isEmpty()) {
             return
         }
 
@@ -166,8 +149,6 @@ class Manager(
     }
 
     fun interceptPaste(text: String, line: Int, offset: Int) {
-        if (editor?.document == null) return
-
         pip.changeStateTo(PipState.STOP)
         val requestBody = PipPasteBody(
             pasteText = text,
@@ -325,5 +306,61 @@ class Manager(
         val originalPasteHandler = editorActionManager.getActionHandler("EditorPaste")
         pasteHandler = PasteHandler(originalPasteHandler, this)
         editorActionManager.setActionHandler("EditorPaste", pasteHandler)
+    }
+
+    private fun initSwingComponents(showIntro: Boolean = false) {
+        contentComponent.let {
+            it.add(agentComponent)
+            it.revalidate()
+            it.repaint()
+            it.addComponentListener(object : ComponentListener {
+                override fun componentResized(e: ComponentEvent?) {
+                    agentComponent.bounds = it.bounds
+                }
+
+                override fun componentMoved(e: ComponentEvent?) {}
+                override fun componentShown(e: ComponentEvent?) {}
+                override fun componentHidden(e: ComponentEvent?) {}
+            })
+        }
+        scope.launch(Dispatchers.EDT) {
+            val visibleArea = scrollModel.visibleArea
+            scrollModel.addVisibleAreaListener {
+                maxX = (it.newRectangle.width - pip.width - MARGIN_X) + it.newRectangle.x
+                maxY = (it.newRectangle.height - pip.height + MARGIN_Y) + it.newRectangle.y
+                pip.anchor(maxX, maxY)
+                println(pip.position)
+            }
+
+            maxX = visibleArea.width - pip.width - MARGIN_X
+            maxY = visibleArea.height - pip.height.toFloat() + MARGIN_Y
+            if(showIntro) {
+                showIntro()
+                delay(6000)
+            }
+
+            agentComponent.showPortal(maxX + 40, maxY)
+            delay(1000)
+            pip.position = Vec2(maxX, maxY)
+            pip.moveTo(Vec2(maxX - 250, maxY), 2500, endAnimationState = PipState.SLEEPING)
+            delay(1500)
+            agentComponent.hidePortal()
+        }
+    }
+
+    private fun showIntro() {
+        val introComponent = IntroComponent(scope) {
+            contentComponent.remove(it)
+            contentComponent.revalidate()
+            contentComponent.repaint()
+        }.also {
+            it.bounds = contentComponent.bounds
+            it.isOpaque = false
+        }
+
+        contentComponent.add(introComponent)
+        contentComponent.revalidate()
+        contentComponent.repaint()
+        introComponent.showIntro()
     }
 }
