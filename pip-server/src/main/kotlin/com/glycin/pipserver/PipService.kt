@@ -42,7 +42,7 @@ class PipService(
                 "JUST_CHATTING" -> chattingRequest(request)
                 "GAMES" -> gamingRequest(request)
                 "MUSIC" -> musicRequest(request)
-                "BUTLER" -> PipResponse.UNSUPPORTED_RESPONSE //TODO: Add simple tasks
+                "BUTLER" -> butlerRequest(request)
                 "STUCK" -> stuckRequest(request)
                 else -> PipResponse.UNKNOWN_RESPONSE
             }
@@ -93,6 +93,10 @@ class PipService(
             LOG.info { "Judge Dredd says: chat request is ${judgment.verdict} because ${judgment.reason}" }
             chatService.judgmentalChat(request, judgment)?.toResponse()
         } ?: PipResponse.FAIL_RESPONSE
+    }
+
+    private fun butlerRequest(requestBody: PipRequestBody): PipResponse {
+        return chatService.chat(requestBody)?.toResponse() ?: PipResponse.FAIL_RESPONSE
     }
 
     private fun musicRequest(request: PipRequestBody): PipResponse {

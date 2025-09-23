@@ -31,4 +31,12 @@ class ToolConfiguration {
             .toolObjects(memeService)
             .build()
     }
+
+    @Bean
+    fun conferenceTools(conferenceService: ConferenceService): ToolCallbackProvider {
+        return MethodToolCallbackProvider
+            .builder()
+            .toolObjects(conferenceService)
+            .build()
+    }
 }

@@ -43,6 +43,24 @@ class ChatterService(
         }
     }
 
+    fun chat(request: PipRequestBody): ChatterResponse? {
+        val response = with(request) {
+            pipChatter
+                .prompt(Prompt(input))
+                .system("${ChatterPrompts.CHATTER_GENERIC_PROMPT} ${if(think)"/think" else "/no_think"}")
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
+                .call()
+                .content()
+        }
+
+        return response?.let {
+            val raw = it.withoutThinkTags()
+            objectMapper.parseToStructuredOutput<ChatterResponse>(raw) { e ->
+                LOG.error { "Could not parse $raw because ${e.message} " }
+            }
+        }
+    }
+
     fun chatMusic(request: PipRequestBody): ChatterResponse? {
         return with(request) {
             pipChatter

@@ -29,11 +29,14 @@ class OllamaConfig(
 
     @Bean("pip_coder")
     fun pipCodingClient(): ChatClient {
-        val tools = toolCallbackProvider.toolCallbacks.filter {
+        val tools = toolCallbackProvider.toolCallbacks.asSequence().filter {
             !it.toolDefinition.name().startsWith("spring_ai_mcp_client_mcpip_play")
         }.filter {
             !it.toolDefinition.name().startsWith("spring_ai_mcp_client_mcpip_meme")
-        }
+        }.filter {
+            !it.toolDefinition.name().startsWith("spring_ai_mcp_client_mcpip_conference")
+        }.toList()
+
         return ChatClient.builder(ollama)
             .defaultToolCallbacks(tools)
             .defaultAdvisors(
