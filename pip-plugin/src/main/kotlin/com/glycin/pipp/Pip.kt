@@ -101,6 +101,7 @@ enum class PipState {
     YOYO,
     JUMP_UP,
     JUMP_DOWN,
+    PONG,
 }
 
 enum class Facing {

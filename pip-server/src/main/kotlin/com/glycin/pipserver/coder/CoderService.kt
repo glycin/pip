@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.callbackFlow
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.chat.memory.ChatMemory
 import org.springframework.ai.chat.prompt.Prompt
+import org.springframework.ai.ollama.api.OllamaModel
+import org.springframework.ai.ollama.api.OllamaOptions
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -144,7 +146,9 @@ class CoderService(
                     Critique the following text:
                     ${request.singleLineText}
                     ${if(additionalContext.isEmpty()) "" else "Here some additional context that has been has been found in a chat log that could be relevant to this matter: $additionalContext. Use only if relevant." }
-                """.trimIndent()))
+                """.trimIndent())
+                //OllamaOptions.builder().model("qwen3:0.6b").build()) //TODO: 0.6B Responses are faster, but suck.
+            )
             .system("${CoderPrompts.AUTO_COMPLETE_SYSTEM_PROMPT} /no_think")
             .advisors { it.param(ChatMemory.CONVERSATION_ID, NanoId.generate()) }
             .call()

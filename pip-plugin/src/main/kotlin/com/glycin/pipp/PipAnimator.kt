@@ -29,6 +29,7 @@ class PipAnimator {
     private val yoyo = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-bored-yoyo.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 8)
     private val jumpUp = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-jumping.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 5)
     private val jumpDown = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-jumping-down.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 5)
+    private val pong = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-pong.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 5)
 
     private var currentSprite : BufferedImage
     private var currentAnimationIndex = 0
@@ -58,6 +59,7 @@ class PipAnimator {
             PipState.YOYO -> showAnimation(yoyo)
             PipState.JUMP_UP -> showAnimation(jumpUp)
             PipState.JUMP_DOWN -> showAnimation(jumpDown)
+            PipState.PONG -> showAnimation(pong)
         }
     }
 
