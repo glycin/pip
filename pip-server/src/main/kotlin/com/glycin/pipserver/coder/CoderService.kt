@@ -156,6 +156,7 @@ class CoderService(
 
         return response?.let { raw ->
             val rawWithoutThink = raw.withoutThinkTags()
+            LOG.info { "Finished autocomplete, returning $rawWithoutThink" }
             objectMapper.parseToStructuredOutput<AutocompleteResponse>(rawWithoutThink) { e ->
                 LOG.info { "Could not parse $rawWithoutThink because ${e.message}" }
             }
