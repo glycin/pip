@@ -8,7 +8,6 @@ Run embedding server (in the correct folder) ->
  1. .\Scripts\activate
  2. fastapi dev .\embeddingServer.py
 
-Embedding model -> https://huggingface.co/jinaai/jina-embeddings-v4 (maybe?)
 MUVERA? (https://research.google/blog/muvera-making-multi-vector-retrieval-as-fast-as-single-vector-search/)
 TODO:
 Add grafana dashboarding using spring ai observability? https://docs.spring.io/spring-ai/reference/observability/index.html
