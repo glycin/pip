@@ -1,0 +1,1 @@
+C:/Projects/pip-doom/pip-doom/Scripts/python.exe c:/Projects/pip-doom/pip-doom/pip-doom.py
