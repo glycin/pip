@@ -24,8 +24,6 @@ class PipInlineProvider: InlineCompletionProvider {
     @OptIn(InternalSerializationApi::class)
     override suspend fun getSuggestion(request: InlineCompletionRequest): InlineCompletionSuggestion {
         val service = request.editor.project?.getService(InlineService::class.java) ?: return InlineCompletionSuggestion.Empty
-        val settings = ApplicationManager.getApplication().getService(PipSettings::class.java)
-        println(settings.state.enableAutoCritique)
 
         val text: String? = runBlocking {
             withTimeoutOrNull(1500) {

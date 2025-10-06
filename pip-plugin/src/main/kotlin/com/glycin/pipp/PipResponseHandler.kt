@@ -183,7 +183,6 @@ class PipResponseHandler(
                     val psiMethod = psiClass?.methods?.firstOrNull { it.name == cf.methodName }
 
                     if(psiClass == null) return@mapNotNull null
-                    println(cf)
                     PsiDocumentManager.getInstance(project).getDocument(psiClass.containingFile)?.let { document ->
                         val validatedLine = min(document.lineCount, cf.line - 1)
                         val startOffset = document.getLineStartOffset(validatedLine)

@@ -29,7 +29,6 @@ class TicTacToeComponent(
     private val aiMoves = mutableListOf<Int>()
     init {
         initializeComponent()
-        println("INITIALIZED")
     }
 
     private fun initializeComponent() {

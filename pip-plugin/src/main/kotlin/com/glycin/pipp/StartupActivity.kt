@@ -6,6 +6,7 @@ import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInspection.util.IntentionFamilyName
 import com.intellij.codeInspection.util.IntentionName
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
@@ -32,8 +33,8 @@ class StartupActivity: IntentionAction, HighPriorityAction {
         if(mainService == null) {
             val application = ApplicationManager.getApplication()
             val config = application.getService(PipSettings::class.java)
-            mainService = application.getService(MainService::class.java)
-            mainService?.init(project, editor, config)
+            mainService = project.getService(MainService::class.java)
+            mainService?.init(editor, config)
         } else {
             mainService?.refocus(editor)
         }

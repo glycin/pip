@@ -82,7 +82,6 @@ class PipConfigurable: SearchableConfigurable {
                 isSelected = settings.state.enableAutoCritique
                 addActionListener {
                     settings.state.enableAutoCritique = isSelected
-                    println("${settings.state.enableAutoCritique} vs $isSelected")
                 }
             }
             add(autoCritiqueToggle, gbc)

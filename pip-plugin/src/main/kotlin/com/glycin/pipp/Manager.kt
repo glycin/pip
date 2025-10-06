@@ -329,7 +329,6 @@ class Manager(
                 maxX = (it.newRectangle.width - pip.width - MARGIN_X) + it.newRectangle.x
                 maxY = (it.newRectangle.height - pip.height + MARGIN_Y) + it.newRectangle.y
                 pip.anchor(maxX, maxY)
-                println(pip.position)
             }
 
             maxX = visibleArea.width - pip.width - MARGIN_X
