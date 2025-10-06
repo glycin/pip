@@ -82,7 +82,8 @@ class AgentComponent(
             font = Fonts.pixelFont.deriveFont(Font.BOLD, 16f)
             foreground = JBColor.RED
             background = PipColors.transparent
-            setBounds(pip.position.x.roundToInt(), 25, 75, 35)
+            val spawnPos = pip.position + (Vec2.right * 250f) + (Vec2.up * 150f)
+            setBounds(spawnPos.x.roundToInt(), spawnPos.y.roundToInt() , 75, 35)
             isContentAreaFilled = false
 
             addActionListener {

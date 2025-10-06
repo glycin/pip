@@ -7,6 +7,7 @@ import com.glycin.pipp.utils.Fonts
 import com.glycin.pipp.utils.SpriteSheetImageLoader
 import com.intellij.openapi.application.EDT
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.util.ui.JBUI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -15,6 +16,7 @@ import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics
 import java.awt.Graphics2D
+import java.awt.Insets
 import javax.swing.JComponent
 import javax.swing.JTextPane
 import javax.swing.text.SimpleAttributeSet
@@ -27,8 +29,8 @@ private const val SCROLL_X_PADDING = 5
 private const val SCROLL_Y_PADDING = 3
 private const val SCROLL_BOTTOM_PADDING = 35
 class PipSpeechBubble(
-    private val width: Int = 256,
-    private val height: Int = 128,
+    private val width: Int = 384,
+    private val height: Int = 192,
     private val pip: Pip,
     fullText: String,
     scope: CoroutineScope,
@@ -63,7 +65,7 @@ class PipSpeechBubble(
 
     override fun paintComponent(g: Graphics?) {
         super.paintComponent(g)
-        val pos = pip.position + (Vec2.up * 50f) + (Vec2.left * 50f)
+        val pos = pip.position + (Vec2.up * 100f) + (Vec2.left * 60f)
         setBounds(pos.x.roundToInt(), pos.y.roundToInt(), width, height)
         scrollPane.setBounds(SCROLL_X_PADDING, SCROLL_Y_PADDING, width - SCROLL_X_PADDING, height - SCROLL_BOTTOM_PADDING)
         if(g is Graphics2D) {
@@ -94,6 +96,7 @@ private class BubbleScrollPane(
         val color = Color.BLACK.toJbColor()
         isEditable = false
         foreground = color
+        margin = Insets(10, 15, 30, 15)
         val doc = styledDocument
         val font = Fonts.pixelFont
         val style = SimpleAttributeSet().apply {
@@ -112,8 +115,8 @@ private class BubbleScrollPane(
         viewport.isOpaque = false
         textPane.isOpaque = false
         textPane.background = PipColors.transparent
-
         setViewportView(textPane)
+        viewportBorder = JBUI.Borders.empty(0, 0, 15, 0)
         verticalScrollBarPolicy = VERTICAL_SCROLLBAR_AS_NEEDED
         horizontalScrollBarPolicy = HORIZONTAL_SCROLLBAR_NEVER
 
@@ -121,7 +124,7 @@ private class BubbleScrollPane(
         scope.launch (Dispatchers.EDT) {
             var curIndex = 0
             while(curIndex < fullText.length && active) {
-                textPane.text = fullText.substring(0, ++curIndex)
+                textPane.text = fullText.take(++curIndex)
                 textPane.caretPosition = textPane.text.length
                 repaint()
                 delay(deltaTime)

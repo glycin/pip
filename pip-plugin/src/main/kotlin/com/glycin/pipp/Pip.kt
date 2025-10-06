@@ -75,7 +75,7 @@ class Pip(
         when(state) {
             PipState.CLIMBING, PipState.HANG_IDLE, PipState.WALL_SHOOTING -> return
             else -> {
-                val x = position.x.coerceIn(0f, max(maxX, 1f))
+                val x = position.x.coerceIn(50f, max(maxX, 1f))
                 position = Vec2(x, maxY)
             }
         }

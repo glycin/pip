@@ -58,7 +58,7 @@ class PipResponseHandler(
             delay(1500)
             agentComponent.showSpeechBubble(pipResponse.response, false)
             agentComponent.showCatJam()
-            delay(30_000)
+            delay(20_000)
             agentComponent.hideSpeechBubble(false)
             delay(3000)
             agentComponent.hideCatJam()
@@ -76,7 +76,7 @@ class PipResponseHandler(
             pipResponse.showMeme()
             delay(500)
             agentComponent.showSpeechBubble(pipResponse.response)
-            delay(30_000)
+            delay(20_000)
             agentComponent.hideSpeechBubble()
         }
     }
@@ -215,7 +215,7 @@ class PipResponseHandler(
 
             delay(1000)
             agentComponent.showSpeechBubble(response.response)
-            delay(30_000)
+            delay(20_000)
             agentComponent.hideSpeechBubble()
         }
     }
@@ -296,7 +296,7 @@ class PipResponseHandler(
                 }
             }
 
-            delay(30_000)
+            delay(20_000)
             agentComponent.hideSpeechBubble()
         }
     }
