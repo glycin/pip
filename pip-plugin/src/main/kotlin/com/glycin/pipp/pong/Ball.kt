@@ -59,7 +59,7 @@ class Ball(
 
         position += direction * (deltaTime * speed).roundToInt()
 
-        if(aiPaddle.position.y <= position.y) {
+        if(aiPaddle.midPoint().y <= position.y) {
             aiPaddle.moveDown(deltaTime)
         } else {
             aiPaddle.moveUp(deltaTime)

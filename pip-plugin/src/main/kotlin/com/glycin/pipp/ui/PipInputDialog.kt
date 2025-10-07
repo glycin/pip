@@ -12,7 +12,7 @@ import javax.swing.JComponent
 class PipInputDialog(project: Project): DialogWrapper(project) {
 
     var userInput: String = ""
-    var newChat: Boolean = false
+    var newChat: Boolean = true
     var think: Boolean = false
     var stream: Boolean = false
 

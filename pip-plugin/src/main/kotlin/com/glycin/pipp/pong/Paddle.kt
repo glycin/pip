@@ -14,6 +14,7 @@ class Paddle(
     fun maxX() = position.x + width
     fun minY() = position.y
     fun maxY() = position.y + height
+    fun midPoint() = Vec2(position.x + (width / 2), position.y + (height / 2))
 
     fun moveUp(deltaTime: Float) {
         position += Vec2.up * (deltaTime * speed).toInt()

@@ -28,6 +28,8 @@ spring:
 #          servers-configuration: classpath:mcp-servers-example.json
 
 logging:
+  pattern:
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}: %msg%n"
   level:
     org:
       springframework:
