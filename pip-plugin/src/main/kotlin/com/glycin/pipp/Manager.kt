@@ -174,6 +174,9 @@ class Manager(
 
     override fun dispose() {
         EditorActionManager.getInstance().setActionHandler("EditorPaste", pasteHandler.originalHandler)
+        contentComponent.remove(agentComponent)
+        contentComponent.repaint()
+        contentComponent.revalidate()
         agentComponent.dispose()
     }
 

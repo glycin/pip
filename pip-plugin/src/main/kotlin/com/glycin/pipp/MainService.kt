@@ -27,12 +27,16 @@ class MainService(
         }
     }
 
+    fun reset(editor: Editor, settings: PipSettings) {
+        dispose()
+        init(editor, settings)
+    }
+
     fun refocus(editor: Editor) {
         manager?.refocusPip(newEditor = editor)
     }
 
     override fun dispose() {
-        PipRestClient.close()
         inputHandler?.let {
             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(it)
         }
