@@ -10,6 +10,7 @@ import com.glycin.pipp.paste.PasteHandler
 import com.glycin.pipp.paste.PipPasteResponseHandler
 import com.glycin.pipp.prompts.CodingPrompts
 import com.glycin.pipp.settings.PipSettings
+import com.glycin.pipp.tictactoe.TicTacToeStarter
 import com.glycin.pipp.ui.IntroComponent
 import com.glycin.pipp.ui.PipInputDialog
 import com.glycin.pipp.utils.Extensions.addCategory

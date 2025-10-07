@@ -42,7 +42,7 @@ class PipSpeechBubble(
     private val scrollPane: BubbleScrollPane
 
     init {
-        val pos = pip.position + (Vec2.up * 50f) + (Vec2.left * 50f)
+        val pos = pip.position + (Vec2.up * 100f) + (Vec2.left * 180)
         setBounds(pos.x.roundToInt(), pos.y.roundToInt(), width, height)
 
         scrollPane = BubbleScrollPane(fullText, scope, deltaTime).apply {
@@ -65,7 +65,7 @@ class PipSpeechBubble(
 
     override fun paintComponent(g: Graphics?) {
         super.paintComponent(g)
-        val pos = pip.position + (Vec2.up * 100f) + (Vec2.left * 60f)
+        val pos = pip.position + (Vec2.up * 100f) + (Vec2.left * 180)
         setBounds(pos.x.roundToInt(), pos.y.roundToInt(), width, height)
         scrollPane.setBounds(SCROLL_X_PADDING, SCROLL_Y_PADDING, width - SCROLL_X_PADDING, height - SCROLL_BOTTOM_PADDING)
         if(g is Graphics2D) {

@@ -119,6 +119,7 @@ class PipResponseHandler(
                     agentComponent.hideSpeechBubble(false)
                     pip.changeStateTo(PipState.YOYO)
                     TicTacToeStarter(
+                        project = project,
                         scope = scope,
                         chatId = NanoId.generate(),
                         pip = pip,
