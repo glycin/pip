@@ -84,6 +84,9 @@ class Manager(
         initSwingComponents()
     }
 
+    fun moveToMiddle() {
+        pip.moveTo(Vec2(maxX / 2, pip.position.y), 3000L)
+    }
 
     fun showInput() {
         val dialog = PipInputDialog(agentComponent, pip, maxX, maxY,  project)

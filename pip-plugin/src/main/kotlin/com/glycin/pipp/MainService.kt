@@ -38,6 +38,10 @@ class MainService(
         init(editor, settings)
     }
 
+    fun movePipToMiddle() {
+        manager?.moveToMiddle()
+    }
+
     fun refocus(editor: Editor) {
         manager?.refocusPip(newEditor = editor)
     }

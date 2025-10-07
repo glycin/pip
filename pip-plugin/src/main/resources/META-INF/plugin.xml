@@ -34,6 +34,10 @@
             <language>JAVA</language>
             <className>com.glycin.pipp.ResetActivity</className>
         </intentionAction>
+        <intentionAction>
+            <language>JAVA</language>
+            <className>com.glycin.pipp.MoveActivity</className>
+        </intentionAction>
         <toolWindow id="CodeGraphWindow"
                     anchor="right"
                     factoryClass="com.glycin.pipp.context.GraphViewFactory"
