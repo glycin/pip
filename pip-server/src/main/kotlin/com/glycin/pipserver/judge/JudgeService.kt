@@ -75,7 +75,7 @@ class JudgeService(
                 LOG.error { "Could not parse $rawWithoutThinkTags because ${e.message} " }
             }?.let { res ->
                 TrollAgentResponseDto(
-                    prankType = PrankType.entries.toTypedArray().random(),
+                    prankType = PrankType.EXPLODE, //PrankType.entries.toTypedArray().random(),
                     response = res.response,
                     memeFileName = res.memeFileName
                 )

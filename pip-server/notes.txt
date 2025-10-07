@@ -25,10 +25,6 @@ LLMs kinda break when u ask them to do things with backticks (`)
 
 fine tuning the model turned to be more destructive than i wanted.
 
-GraalPy + ML packages + windows = bad time
-
-"org.openrewrite.config.RecipeIntrospectionException: Kotlin recipes must be instantiated using Jackson ?!?!?!?!?!?
-
 OLLAMA chat client can't handle <think></think> tags for structured output :(
 
 We need to disable banner and console logging for STDIO transport to work for the mcp server?
@@ -48,4 +44,3 @@ STUFF THAT CAN GO WRONG:
 
 TODO:
 - ADD BORED FLOW THAT MAKES PIP ADD TODO COMMENTS EVERYWHERE
-- Build the jar and add it to intellij
