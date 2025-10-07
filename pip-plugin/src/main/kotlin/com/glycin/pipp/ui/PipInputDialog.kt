@@ -1,5 +1,9 @@
 package com.glycin.pipp.ui
 
+import com.glycin.pipp.AgentComponent
+import com.glycin.pipp.Pip
+import com.glycin.pipp.PipState
+import com.glycin.pipp.Vec2
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.util.IconLoader
@@ -9,7 +13,13 @@ import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JComponent
 
-class PipInputDialog(project: Project): DialogWrapper(project) {
+class PipInputDialog(
+    private val agentComponent: AgentComponent,
+    private val pip: Pip,
+    private val maxX: Float,
+    private val maxY: Float,
+    project: Project
+): DialogWrapper(project) {
 
     var userInput: String = ""
     var newChat: Boolean = true
@@ -57,6 +67,18 @@ class PipInputDialog(project: Project): DialogWrapper(project) {
             row {
                 checkBox("Stream?")
                     .bindSelected(::stream)
+            }
+            separator()
+            row {
+                label("Pip you're drunk, go to sleep:")
+                button(
+                    text = "Sleep" ,
+                    actionListener = {
+                        agentComponent.hideSpeechBubble(true)
+                        pip.position = Vec2(maxX, maxY)
+                        pip.changeStateTo(PipState.SLEEPING)
+                    }
+                )
             }
         }
     }

@@ -28,7 +28,13 @@ class MainService(
     }
 
     fun reset(editor: Editor, settings: PipSettings) {
-        dispose()
+        inputHandler?.let {
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(it)
+        }
+        inputHandler = null
+        manager?.dispose()
+        manager = null
+
         init(editor, settings)
     }
 
@@ -37,6 +43,7 @@ class MainService(
     }
 
     override fun dispose() {
+        PipRestClient.close()
         inputHandler?.let {
             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(it)
         }

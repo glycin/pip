@@ -85,7 +85,7 @@ class Manager(
 
 
     fun showInput() {
-        val dialog = PipInputDialog(project)
+        val dialog = PipInputDialog(agentComponent, pip, maxX, maxY,  project)
 
         if(!dialog.showAndGet() || dialog.userInput.isEmpty()) {
             return
