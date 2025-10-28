@@ -27,15 +27,12 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
         <intentionAction>
-            <language>JAVA</language>
             <className>com.glycin.pipp.StartupActivity</className>
         </intentionAction>
         <intentionAction>
-            <language>JAVA</language>
             <className>com.glycin.pipp.ResetActivity</className>
         </intentionAction>
         <intentionAction>
-            <language>JAVA</language>
             <className>com.glycin.pipp.MoveActivity</className>
         </intentionAction>
         <toolWindow id="CodeGraphWindow"
