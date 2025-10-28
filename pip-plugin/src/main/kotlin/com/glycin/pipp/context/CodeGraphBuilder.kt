@@ -7,6 +7,10 @@ import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.PsiShortNamesCache
 import com.glycin.pipp.utils.Extensions.fqMethodName
+import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.toUElement
+import org.jetbrains.uast.visitor.AbstractUastVisitor
 
 class CodeGraphBuilder(
     private val project: Project,
@@ -79,11 +83,11 @@ class CodeGraphBuilder(
     }
 
     private fun addInvocationEdges(method: PsiMethod, edges: MutableList<CodeEdge>) {
+        val uMethod = method.toUElement() as UMethod
         val callerId = method.toMethodId()
-        method.body?.accept(object : JavaRecursiveElementWalkingVisitor() {
-            override fun visitMethodCallExpression(expression: PsiMethodCallExpression) {
-                super.visitMethodCallExpression(expression)
-                val resolved = expression.resolveMethod()
+        uMethod.accept(object : AbstractUastVisitor() {
+            override fun visitCallExpression(node: UCallExpression): Boolean {
+                val resolved = node.resolve()
                 if (resolved != null && resolved.isValid) {
                     val calleeId = resolved.toMethodId()
                     edges += CodeEdge(
@@ -92,6 +96,7 @@ class CodeGraphBuilder(
                         type = CodeEdgeType.INVOKES
                     )
                 }
+                return super.visitCallExpression(node)
             }
         })
     }
