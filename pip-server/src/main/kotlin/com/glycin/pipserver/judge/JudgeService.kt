@@ -19,7 +19,7 @@ private val LOG = KotlinLogging.logger {}
 
 @Service
 class JudgeService(
-    @param:Qualifier("pip") private val judgeDredd: ChatClient,
+    @param:Qualifier("pip_toolless") private val judgeDredd: ChatClient,
     @param:Qualifier("pipObjectMapper") private val objectMapper: ObjectMapper,
 ) {
 

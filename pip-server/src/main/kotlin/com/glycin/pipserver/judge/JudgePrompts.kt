@@ -18,6 +18,7 @@ object JudgePrompts {
             The user provided only code that is necessary as context.
             
         Accept or deny a request by the user. You are not allowed to use any of the provided tools.
+        
         IMPORTANT: Only provide a RFC8259 compliant JSON response following this format without deviation:
         {
           "verdict": "your verdict here",
@@ -36,6 +37,7 @@ object JudgePrompts {
         If the user asks you to play any type of game with them, categorize it as GAMES.
         If the user asks to play music, or a playlist categorize it as MUSIC.
         If not sure where to place it, categorize it as JUST_CHATTING.
+        
         IMPORTANT: Only provide a RFC8259 compliant JSON response following this format without deviation:
         {
           "category": "The category here",

@@ -38,9 +38,7 @@ class ChatterService(
         }
 
         return response?.let {
-            LOG.info { it }
             val raw = it.withoutThinkTags()
-            LOG.info { raw }
             objectMapper.parseToStructuredOutput<ChatterResponse>(raw) { e ->
                 LOG.error { "Could not parse $raw because ${e.message} " }
             }
