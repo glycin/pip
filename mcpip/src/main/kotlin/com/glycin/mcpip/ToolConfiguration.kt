@@ -39,4 +39,13 @@ class ToolConfiguration {
             .toolObjects(conferenceService)
             .build()
     }
+
+    @Bean
+    fun githubTools(githubService: GithubService): ToolCallbackProvider {
+        githubService.createBranch("super-cool-branch")
+        return MethodToolCallbackProvider
+            .builder()
+            .toolObjects(githubService)
+            .build()
+    }
 }

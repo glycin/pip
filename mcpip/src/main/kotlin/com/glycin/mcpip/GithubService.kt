@@ -18,25 +18,19 @@ class GithubService(
     )
     fun createBranch(
         @ToolParam(description = "New branch name to create. For example: my-awesome-branch") branchName: String,
-    ): GitResult {
+    ): String {
         return try {
+            val outputs = mutableListOf<String>()
+
             // Checkout the base branch first
             executeGitCommand(githubProperties.repositoryPath, "git", "checkout", "main")
 
             // Create and checkout new branch
-            val output = executeGitCommand(githubProperties.repositoryPath, "git", "checkout", "-b", branchName)
-
-            GitResult(
-                success = true,
-                message = "Branch '$branchName' created successfully from main",
-                output = output
-            )
+            outputs.add(executeGitCommand(githubProperties.repositoryPath, "git", "checkout", "-b", branchName))
+            outputs.add(executeGitCommand(githubProperties.repositoryPath, "git", "push", "-u", "origin", branchName))
+            "Branch '$branchName' created successfully from main"
         } catch (e: Exception) {
-            GitResult(
-                success = false,
-                message = "Failed to create branch: ${e.message}",
-                output = null
-            )
+            "Failed to create branch: ${e.message}"
         }
     }
 
@@ -46,7 +40,7 @@ class GithubService(
     )
     fun pushToGitHub(
         @ToolParam(description = "The commit message for these changes.") commitMessage: String,
-    ): GitResult {
+    ): String {
         return try {
             val outputs = mutableListOf<String>()
 
@@ -59,17 +53,9 @@ class GithubService(
             // Push to remote
             outputs.add(executeGitCommand(githubProperties.repositoryPath, "git", "push"))
 
-            GitResult(
-                success = true,
-                message = "Successfully committed and pushed to",
-                output = outputs.joinToString("\n")
-            )
+            "Successfully committed and pushed to remote, with the following outputs: ${outputs.joinToString("\n")}"
         } catch (e: Exception) {
-            GitResult(
-                success = false,
-                message = "Failed to push: ${e.message}",
-                output = null
-            )
+            "Failed to push: ${e.message}"
         }
     }
     private fun executeGitCommand(workingDir: String, vararg command: String): String {
@@ -89,10 +75,4 @@ class GithubService(
 
         return output
     }
-
-    data class GitResult(
-        val success: Boolean,
-        val message: String,
-        val output: String?
-    )
 }

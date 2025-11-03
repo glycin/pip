@@ -11,5 +11,4 @@ class GithubConfiguration
 @ConfigurationProperties(prefix = "github")
 data class GithubProperties(
     val repositoryPath: String,
-    val accessToken: String,
 )

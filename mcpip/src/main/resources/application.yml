@@ -31,5 +31,4 @@ meme:
   save-directory: ${SAVE_DIRECTORY}
 
 github:
-  access-token: ${GITHUB_ACCESS_TOKEN}
-  repository-path: ${REPOSITORY_PATH}
+  repository-path: C:\Projects\pip
