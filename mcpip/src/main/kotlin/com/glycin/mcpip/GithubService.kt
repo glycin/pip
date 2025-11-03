@@ -35,10 +35,10 @@ class GithubService(
     }
 
     @Tool(
-        name = "pushToGitHub",
+        name = "gitCommitAndPush",
         description = "Commits changes and pushes them to GitHub with a commit message"
     )
-    fun pushToGitHub(
+    fun commitAndPush(
         @ToolParam(description = "The commit message for these changes.") commitMessage: String,
     ): String {
         return try {
