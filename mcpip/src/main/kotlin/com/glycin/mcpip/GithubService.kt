@@ -1,5 +1,6 @@
 package com.glycin.mcpip
 
+import org.slf4j.LoggerFactory
 import org.springframework.ai.tool.annotation.Tool
 import org.springframework.ai.tool.annotation.ToolParam
 import org.springframework.stereotype.Service
@@ -11,14 +12,13 @@ import java.io.InputStreamReader
 class GithubService(
     private val githubProperties: GithubProperties,
 ) {
+    private val log = LoggerFactory.getLogger(SpotifyService::class.java)
 
-    @Tool(
-        name = "createGitBranch",
-        description = "Creates a new Git branch in a local repository"
-    )
+    @Tool(description = "Creates a new Git branch in a local repository")
     fun createBranch(
         @ToolParam(description = "New branch name to create. For example: my-awesome-branch") branchName: String,
     ): String {
+        log.info("Invoked git create branch tool with branch name ${branchName}!")
         return try {
             val outputs = mutableListOf<String>()
 
@@ -34,13 +34,12 @@ class GithubService(
         }
     }
 
-    @Tool(
-        name = "gitCommitAndPush",
-        description = "Commits changes and pushes them to GitHub with a commit message"
-    )
+    @Tool(description = "Commits changes and pushes them to GitHub with a commit message")
     fun commitAndPush(
         @ToolParam(description = "The commit message for these changes.") commitMessage: String,
     ): String {
+        log.info("Invoked git commit with commit message ${commitMessage}!")
+
         return try {
             val outputs = mutableListOf<String>()
 
