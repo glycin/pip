@@ -15,7 +15,7 @@ class GithubService(
     private val log = LoggerFactory.getLogger(SpotifyService::class.java)
 
     @Tool(description = "Creates a new Git branch in a local repository")
-    fun createBranch(
+    fun gitCreateBranch(
         @ToolParam(description = "New branch name to create. For example: my-awesome-branch") branchName: String,
     ): String {
         log.info("Invoked git create branch tool with branch name ${branchName}!")
@@ -35,7 +35,7 @@ class GithubService(
     }
 
     @Tool(description = "Commits changes and pushes them to GitHub with a commit message")
-    fun commitAndPush(
+    fun gitCommitAndPush(
         @ToolParam(description = "The commit message for these changes.") commitMessage: String,
     ): String {
         log.info("Invoked git commit with commit message ${commitMessage}!")
@@ -57,6 +57,7 @@ class GithubService(
             "Failed to push: ${e.message}"
         }
     }
+
     private fun executeGitCommand(workingDir: String, vararg command: String): String {
         val processBuilder = ProcessBuilder(*command)
             .directory(File(workingDir))
