@@ -17,16 +17,12 @@ private const val DEVICE_NAME = "GLYCINWORK"
 
 @Service
 class SpotifyService(
-    spotifyProperties: SpotifyProperties,
+    private val spotifyProperties: SpotifyProperties,
 ) {
     private val log = LoggerFactory.getLogger(SpotifyService::class.java)
 
-    private val spotifyApi = SpotifyApi.builder()
-        .setClientId(spotifyProperties.clientId)
-        .setClientSecret(spotifyProperties.clientSecret)
-        .setRedirectUri(SpotifyHttpManager.makeUri(spotifyProperties.redirectUrl))
-        .setRefreshToken(spotifyProperties.refreshToken)
-        .build()
+    private lateinit var spotifyApi: SpotifyApi
+    private var inititalized = false
 
     // Auth request to create a new refresh token
     /*private val authRequest = spotifyApi
@@ -38,21 +34,35 @@ class SpotifyService(
     private val authCodeRequest = spotifyApi.authorizationCode("ADD TOKEN FROM MANUAL AUTH").build().execute()
     */
 
-    init {
+    /*init {
+
+        println(authCodeRequest.refreshToken)
+
+    }*/
+
+    private fun initialize(){
+        if(inititalized) return
+
+        spotifyApi = SpotifyApi.builder()
+            .setClientId(spotifyProperties.clientId)
+            .setClientSecret(spotifyProperties.clientSecret)
+            .setRedirectUri(SpotifyHttpManager.makeUri(spotifyProperties.redirectUrl))
+            .setRefreshToken(spotifyProperties.refreshToken)
+            .build()
+
         // Use refresh token for a new access token
-        spotifyApi.authorizationCodeRefresh().build().execute().also {
-            spotifyApi.accessToken = it.accessToken
+        spotifyApi!!.authorizationCodeRefresh().build().execute().also {
+            spotifyApi!!.accessToken = it.accessToken
         }
 
-        /*
-        println(authCodeRequest.refreshToken)
-         */
+        inititalized = true
     }
 
     @Tool(description = "Play a song. Input is the name of the song")
     fun playSong(
         @ToolParam(description = "The name of the song to be played") songName: String,
     ): String {
+        initialize()
         log.info("PLAY SONG TOOL INVOKED => Trying to find song: $songName")
         return searchSong(songName)?.let { track ->
             playTrack(track)
@@ -63,6 +73,7 @@ class SpotifyService(
     fun playArtist(
         @ToolParam(description = "The name of the artist to play music from") artistName: String,
     ): String {
+        initialize()
         log.info("PLAY ARTIST TOOL INVOKED => Trying to find song by artist: $artistName")
         return searchSong(songName = null, artistName = artistName)?.let { track ->
             playTrack(track)
@@ -74,6 +85,7 @@ class SpotifyService(
         @ToolParam(description = "The name of the song to be played") songName: String,
         @ToolParam(description = "The name of the artist that performs the song") artistName: String,
     ): String {
+        initialize()
         log.info("PLAY SONG BY ARTIST TOOL INVOKED => Trying to find song $songName by artist: $artistName")
         return searchSong(songName, artistName)?.let { track ->
             playTrack(track)
@@ -82,6 +94,7 @@ class SpotifyService(
 
     @Tool(description = "Start playing from the metal playlist")
     fun playFromMetal(): String {
+        initialize()
         log.info("PLAY METAL PLAYLIST TOOL INVOKED")
         val randomOffset = Random.nextInt(0, 300)
         val devices = spotifyApi.usersAvailableDevices.build().execute()
