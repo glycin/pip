@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.TicTacToeRequestBody
+import com.glycin.pipserver.util.Emojis
 import com.glycin.pipserver.util.parseToStructuredOutput
 import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -23,6 +24,7 @@ class ChatterService(
 ) {
 
     fun judgmentalChat(request: PipRequestBody, judgment: JudgeAgentResponse): ChatterResponse? {
+        LOG.info { "Judgy chatting agent ${Emojis.chatter} is handling chatting request with id ${request.chatId}" }
         val response = with(request) {
             pipChatter
                 .prompt(Prompt("""
@@ -44,6 +46,7 @@ class ChatterService(
     }
 
     fun chat(request: PipRequestBody): ChatterResponse? {
+        LOG.info { "Chatting agent ${Emojis.chatter} is handling chatting request with id ${request.chatId}" }
         val response = with(request) {
             pipChatter
                 .prompt(Prompt(input))
@@ -62,6 +65,7 @@ class ChatterService(
     }
 
     fun chatMusic(request: PipRequestBody): ChatterResponse? {
+        LOG.info { "Music chatting agent ${Emojis.rocker} is handling music request with id ${request.chatId}" }
         return with(request) {
             pipChatter
                 .prompt(Prompt("""
@@ -76,6 +80,7 @@ class ChatterService(
     }
 
     fun game(request: PipRequestBody): GamerResponse? {
+        LOG.info { "Gaming chatting agent ${Emojis.gamer} is handling request with id ${request.chatId}" }
         val response = with(request) {
             pipChatter
                 .prompt(Prompt("""
@@ -119,7 +124,7 @@ class ChatterService(
     }
 
     fun chatStuck(request: PipRequestBody): ChatterResponse? {
-        LOG.info { "Helping the user with their little stuck problem." }
+        LOG.info { "${Emojis.butler} is helping the user with their little stuck problem." }
         val response = with(request) {
             pipChatter
                 .prompt(Prompt("""

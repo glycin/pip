@@ -1,5 +1,6 @@
 package com.glycin.pipserver.retro
 
+import com.glycin.pipserver.util.Emojis
 import com.glycin.pipserver.util.NanoId
 import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -56,7 +57,7 @@ class RetroService(
                 .content()
 
         val trimmed = action?.withoutThinkTags() ?: "ATTACK"
-        LOG.info { "Playing doom, now $trimmed" }
+        LOG.info { "Playing doom ${Emojis.gun}, now $trimmed" }
         return RetroPlayResponse(trimmed)
     }
 }

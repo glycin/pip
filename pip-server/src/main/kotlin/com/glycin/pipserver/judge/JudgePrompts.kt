@@ -30,7 +30,7 @@ object JudgePrompts {
         JUST_CHATTING, CODING, GAMES, MUSIC, BUTLER, STUCK.
         If the user is asking random questions, categorize it as JUST_CHATTING.
         If the user is asking for you to generate a meme, categorize it as JUST_CHATTING.
-        If the user is asking you to do simple non-coding tasks like create files or summarize text, categorize it as BUTLER.
+        If the user is asking you to do simple tasks like summarize text or create a git branch or push to git, categorize it as BUTLER.
         If the user is telling you that he is stuck or can't concentrate, categorize it as STUCK.
         If the user asks you questions about code or wants you to generate code, categorize it as CODING.
         If the user asks you to play any type of game with them, categorize it as GAMES.

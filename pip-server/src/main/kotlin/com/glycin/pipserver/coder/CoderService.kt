@@ -6,6 +6,7 @@ import com.glycin.pipserver.qdrant.QdrantService
 import com.glycin.pipserver.shared.PipPasteBody
 import com.glycin.pipserver.shared.PipPrankRequestBody
 import com.glycin.pipserver.shared.PipRequestBody
+import com.glycin.pipserver.util.Emojis
 import com.glycin.pipserver.util.NanoId
 import com.glycin.pipserver.util.getThinkText
 import com.glycin.pipserver.util.parseToStructuredOutput
@@ -17,8 +18,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.chat.memory.ChatMemory
 import org.springframework.ai.chat.prompt.Prompt
-import org.springframework.ai.ollama.api.OllamaModel
-import org.springframework.ai.ollama.api.OllamaOptions
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -37,6 +36,7 @@ class CoderService(
         pipRequestBody: PipRequestBody,
         judgement: JudgeAgentResponse = JudgeAgentResponse("accept", "good question")
     ): CoderResponse? {
+        LOG.info { "Coding agent ${Emojis.coder} is handling coding request with id ${pipRequestBody.chatId}" }
         val additionalContext = qdrantService.search(pipRequestBody.input, "Riccardo")
             .mapNotNull { t ->
                 t.takeUnless { it.text.isEmpty() }
@@ -66,6 +66,7 @@ class CoderService(
     }
 
     fun generatePoetryPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
+        LOG.info { "Coding agent ${Emojis.troll} is handling poetry request with id ${pipPrankRequestBody.chatId}" }
         val poemType = listOf("haiku", "poem", "limerick", "lyrical poem").random()
         LOG.info{ "Generating a $poemType" }
         val poem = pipCoder
@@ -81,6 +82,7 @@ class CoderService(
     }
 
     fun generateTranslationPrank(pipPrankRequestBody: PipPrankRequestBody): PrankerResponse? {
+        LOG.info { "Coding agent ${Emojis.troll} is handling translation request with id ${pipPrankRequestBody.chatId}" }
         val language = listOf("GREEK", "ITALIAN", "JAPANESE", "CHINESE").random()
         LOG.info{ "Translating code to $language" }
         val translatedCode = with(pipPrankRequestBody) {
@@ -100,7 +102,7 @@ class CoderService(
     }
 
     fun reviewPastedCode(pasteBody: PipPasteBody): CoderResponse? {
-        LOG.info { "Reviewing pasted text" }
+        LOG.info { "Coding agent ${Emojis.coder} is reviewing pasted code with id ${pasteBody.chatId} (you naughty programmer)" }
         val additionalContext = qdrantService.search(pasteBody.pasteText, null)
             .mapNotNull { t ->
                 t.takeUnless { it.text.isEmpty() }
@@ -156,7 +158,7 @@ class CoderService(
 
         return response?.let { raw ->
             val rawWithoutThink = raw.withoutThinkTags()
-            LOG.info { "Finished autocomplete, returning $rawWithoutThink" }
+            LOG.info { "${Emojis.coder} Finished autocomplete, returning $rawWithoutThink" }
             objectMapper.parseToStructuredOutput<AutocompleteResponse>(rawWithoutThink) { e ->
                 LOG.info { "Could not parse $rawWithoutThink because ${e.message}" }
             }

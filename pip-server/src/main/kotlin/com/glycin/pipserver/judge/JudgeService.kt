@@ -5,6 +5,7 @@ import com.glycin.pipserver.shared.JudgeAgentResponse
 import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PrankType
 import com.glycin.pipserver.shared.TrollAgentResponseDto
+import com.glycin.pipserver.util.Emojis
 import com.glycin.pipserver.util.parseToStructuredOutput
 import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -23,7 +24,7 @@ class JudgeService(
 ) {
 
     fun categorize(pipRequestBody: PipRequestBody): CategorizationResponse? {
-        LOG.info { "Categorization agent is handling request with id ${pipRequestBody.chatId}" }
+        LOG.info { "Categorization agent ${Emojis.nerdFace} is handling request with id ${pipRequestBody.chatId}" }
         val categorization = with(pipRequestBody) {
             judgeDredd
                 .prompt(Prompt(input))
@@ -42,7 +43,7 @@ class JudgeService(
     }
 
     fun judge(pipRequestBody: PipRequestBody): JudgeAgentResponse? {
-        LOG.info { "Judge agent is handling request with id ${pipRequestBody.chatId}" }
+        LOG.info { "Judge agent ${Emojis.judge} is handling request with id ${pipRequestBody.chatId}" }
         val judgment = with(pipRequestBody) {
             judgeDredd
                 .prompt(Prompt(input))
@@ -61,7 +62,7 @@ class JudgeService(
     }
 
     fun troll(pipRequestBody: PipRequestBody, judgement: JudgeAgentResponse): TrollAgentResponseDto? {
-        LOG.info { "Troll agent is handling request with id ${pipRequestBody.chatId}" }
+        LOG.info { "Troll agent ${Emojis.troll} is handling request with id ${pipRequestBody.chatId}" }
         val troll = judgeDredd
             .prompt(Prompt("Original user query: ${pipRequestBody.input}. Denial reason ${judgement.reason}"))
             .system("${JudgePrompts.TROLL} /no_think")
