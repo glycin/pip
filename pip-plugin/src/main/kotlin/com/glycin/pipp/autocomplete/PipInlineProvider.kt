@@ -17,6 +17,8 @@ class PipInlineProvider: InlineCompletionProvider {
     override val id: InlineCompletionProviderID get() = InlineCompletionProviderID("Pip_Auto_Critique")
 
     override fun isEnabled(event: InlineCompletionEvent): Boolean {
+        // turn off until we figure out why it isnt working with kotlin
+        return false
         val settings = ApplicationManager.getApplication().getService(PipSettings::class.java)
         return settings.state.enableAutoCritique
     }

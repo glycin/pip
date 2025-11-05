@@ -45,6 +45,11 @@
                                  instance="com.glycin.pipp.settings.PipConfigurable"
                                  displayName="Pip Settings"/>
         <inline.completion.provider implementation="com.glycin.pipp.autocomplete.PipInlineProvider"/>
+
+        <completion.contributor
+                language="any"
+                order="first"
+                implementationClass="com.glycin.pipp.autocomplete.PipCompletionContributor"/>
     </extensions>
 
     <actions>
