@@ -19,7 +19,7 @@ spring:
               command: java
               args:
                 - -jar
-                - target/mcpip-1.0.0.jar
+                - target/mcpip-1.0.1.jar
               env:
                 SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID}
                 SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
