@@ -15,7 +15,8 @@ class ConferenceService {
         Conference(LocalDate.of(2025, 11, 5), LocalDate.of(2025, 11, 7), "JFall", "Organized by the NLJUG in Ede, the Netherlands. Say hi to your colleagues!"),
         Conference(LocalDate.of(2025, 11, 26), LocalDate.of(2025, 11, 28), "Kotlin Dev Day", "Organized by the Xebia in Amsterdam, the Netherlands. Say hi to all Kotlin fanboys!!!"),
         Conference(LocalDate.of(2026, 1, 21), LocalDate.of(2026, 1, 23), "Utrecht JUG", "The first Utrecht JUG of the year, and you are part of it!"),
-        Conference(LocalDate.of(2026, 2, 2), LocalDate.of(2026, 2, 4), "JFokus", "Amazing conference in Stockholm. This years theme is: Norse gods!")
+        Conference(LocalDate.of(2026, 2, 2), LocalDate.of(2026, 2, 4), "JFokus", "Amazing conference in Stockholm. This years theme is: Norse gods!"),
+        Conference(LocalDate.of(2026, 2, 23), LocalDate.of(2026, 2, 25), "JUG Noord", "The Java user group of the north of the Netherlands!")
     )
 
     @Tool(description = "Get the current conference where this agent is being presented")

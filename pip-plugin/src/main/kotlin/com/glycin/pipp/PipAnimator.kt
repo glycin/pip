@@ -1,9 +1,7 @@
 package com.glycin.pipp
 
 import com.glycin.pipp.utils.SpriteSheetImageLoader
-import java.awt.Graphics2D
 import java.awt.image.BufferedImage
-import kotlin.math.roundToInt
 
 private const val STANDARD_CELL_WIDTH = 40
 private const val STANDARD_CELL_HEIGHT = 40
@@ -30,6 +28,11 @@ class PipAnimator {
     private val jumpUp = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-jumping.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 5)
     private val jumpDown = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-jumping-down.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 5)
     private val pong = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-pong.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 5)
+
+    private val vikingSit = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-sitting-sheet-viking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 8)
+    private val vikingSleep = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-sleeping-sheet-viking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 8)
+    private val vikingTalk = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-talking-sheet-viking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 8)
+    private val vikingWalk = SpriteSheetImageLoader.loadSprites("$BASE_PATH/pip-walk-sheet-viking.png", STANDARD_CELL_WIDTH, STANDARD_CELL_HEIGHT, 8)
 
     private var currentSprite : BufferedImage
     private var currentAnimationIndex = 0
