@@ -19,13 +19,13 @@ logging:
   pattern:
     console:
   file:
-    name: C:\Users\lorda\Desktop\Pip\mcp.log
+    name: /Users/glycin/Projects/pip-artifacts/mcp.log
 
 spotify:
-  client-id: ${SPOTIFY_CLIENT_ID}
-  client-secret: ${SPOTIFY_CLIENT_SECRET}
+  client-id: ${SPOTIFY_CLIENT_ID:asdasd}
+  client-secret: ${SPOTIFY_CLIENT_SECRET:asdasd}
   redirect-url: http://127.0.0.1:8080/callback
-  refresh-token: ${SPOTIFY_REFRESH_TOKEN}
+  refresh-token: ${SPOTIFY_REFRESH_TOKEN:asdasd}
 
 meme:
   save-directory: ${SAVE_DIRECTORY}

@@ -18,7 +18,7 @@ repositories {
     mavenCentral()
 }
 
-extra["springAiVersion"] = "1.0.3"
+extra["springAiVersion"] = "1.1.4"
 val kotlinLoggingVersion = "7.0.7"
 val qdrantVersion = "1.15.0"
 val grpcVersion = "1.65.1"

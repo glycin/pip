@@ -6,6 +6,7 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor
 import org.springframework.ai.chat.memory.ChatMemory
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider
 import org.springframework.ai.ollama.OllamaChatModel
+import org.springframework.ai.ollama.api.OllamaChatOptions
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -16,9 +17,12 @@ class OllamaConfig(
     private val toolCallbackProvider: SyncMcpToolCallbackProvider,
 ) {
 
+    private val noThinkOptions = OllamaChatOptions.builder().disableThinking().build()
+
     @Bean("pip")
     fun pipClient(): ChatClient {
         return ChatClient.builder(ollama)
+            .defaultOptions(noThinkOptions)
             .defaultToolCallbacks(toolCallbackProvider)
             .defaultAdvisors(
                 SimpleLoggerAdvisor(),
@@ -38,6 +42,7 @@ class OllamaConfig(
         }.toList()
 
         return ChatClient.builder(ollama)
+            .defaultOptions(noThinkOptions)
             .defaultToolCallbacks(tools)
             .defaultAdvisors(
                 SimpleLoggerAdvisor(),
@@ -49,6 +54,7 @@ class OllamaConfig(
     @Bean("pip_toolless")
     fun pipToollessClient(): ChatClient {
         return ChatClient.builder(ollama)
+            .defaultOptions(noThinkOptions)
             .defaultAdvisors(
                 SimpleLoggerAdvisor(),
                 MessageChatMemoryAdvisor.builder(chatMemory).build(),

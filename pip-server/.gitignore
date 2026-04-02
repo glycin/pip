@@ -40,3 +40,6 @@ out/
 .kotlin
 
 target/*
+
+### Mac OS ###
+.DS_Store
