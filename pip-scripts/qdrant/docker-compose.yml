@@ -10,7 +10,7 @@ services:
       - 6334
       - 6335
     volumes:
-      - C:\Projects\pip-storage\qdrant:/qdrant/storage
+      - ~/Projects/pip-artifacts/pip-storage/qdrant:/qdrant/storage
 
 configs:
   qdrant_config:
