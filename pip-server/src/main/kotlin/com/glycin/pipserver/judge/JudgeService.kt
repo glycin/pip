@@ -6,6 +6,7 @@ import com.glycin.pipserver.shared.PipRequestBody
 import com.glycin.pipserver.shared.PrankType
 import com.glycin.pipserver.shared.TrollAgentResponseDto
 import com.glycin.pipserver.util.Emojis
+import com.glycin.pipserver.util.NanoId
 import com.glycin.pipserver.util.parseToStructuredOutput
 import com.glycin.pipserver.util.withoutThinkTags
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -29,7 +30,7 @@ class JudgeService(
             judgeDredd
                 .prompt(Prompt(input))
                 .system("${JudgePrompts.CATEGORIZATION_JUDGE} /no_think")
-                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, NanoId.generate()) }
                 .call()
                 .content()
         }
@@ -48,7 +49,7 @@ class JudgeService(
             judgeDredd
                 .prompt(Prompt(input))
                 .system("${JudgePrompts.GENERIC_JUDGE} ${if(think)"/think" else "/no_think"}")
-                .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
+                .advisors { it.param(ChatMemory.CONVERSATION_ID, NanoId.generate()) }
                 .call()
                 .content()
         }

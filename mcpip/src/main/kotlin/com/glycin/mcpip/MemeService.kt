@@ -190,7 +190,7 @@ class MemeService(
         graphics.dispose()
 
         // Convert to Base64
-        val outputFile = File("${memeProperties.saveDirectory}\\${UUID.randomUUID()}.png")
+        val outputFile = File("${memeProperties.saveDirectory}//${UUID.randomUUID()}.png")
         val writeOk = ImageIO.write(image, "png", outputFile)
         if(!writeOk) return "Could not generate and save meme."
         return "Generated meme and saved with name: ${outputFile.name}"
