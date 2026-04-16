@@ -13,7 +13,7 @@ import se.michaelthelin.spotify.model_objects.specification.Track
 import kotlin.random.Random
 
 private const val PLAYLIST_ID = "spotify:playlist:4agDUCts2VBH5yBr20YUSB"
-private const val DEVICE_NAME = "GLYCINWORK"
+private const val DEVICE_NAME = "Glycin’s MacBook Pro"
 
 @Service
 class SpotifyService(
@@ -151,6 +151,9 @@ class SpotifyService(
                     .execute()
                 log.info("Now playing ${track.name} on ${device.name}")
                 "Now playing ${track.name}, performed by ${track.artists.joinToString { it.name }}, from the album ${track.album.name} released in ${track.album.releaseDate}"
-            } ?: "Could not find an active device to play song ${track.name}"
+            } ?: run {
+                log.info("Could not find an active device named $DEVICE_NAME to play ${track.name}. Available devices: ${devices?.joinToString { it.name } ?: "none"}")
+                "Could not find an active device to play song ${track.name}"
+            }
     }
 }

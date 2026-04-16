@@ -22,13 +22,13 @@ logging:
     name: /Users/glycin/Projects/pip-artifacts/mcp.log
 
 spotify:
-  client-id: ${SPOTIFY_CLIENT_ID:asdasd}
-  client-secret: ${SPOTIFY_CLIENT_SECRET:asdasd}
+  client-id: ${SPOTIFY_CLIENT_ID}
+  client-secret: ${SPOTIFY_CLIENT_SECRET}
   redirect-url: http://127.0.0.1:8080/callback
-  refresh-token: ${SPOTIFY_REFRESH_TOKEN:asdasd}
+  refresh-token: ${SPOTIFY_REFRESH_TOKEN}
 
 meme:
   save-directory: ${SAVE_DIRECTORY}
 
 github:
-  repository-path: C:\Projects\pip
+  repository-path: ~/Projects/pip
