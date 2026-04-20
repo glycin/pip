@@ -20,12 +20,12 @@ fun showPngInPopup(owner: JComponent, imagePath: String, title: String = "Hheheh
 
     val builder = JBPopupFactory.getInstance()
         .createComponentPopupBuilder(panel, label)
-        .setFocusable(true)
-        .setRequestFocus(true)
+        .setFocusable(false)
+        .setRequestFocus(false)
         .setResizable(true)
         .setMovable(true)
         .setCancelOnClickOutside(true)
-        .setCancelOnOtherWindowOpen(true)
+        .setCancelOnOtherWindowOpen(false)
         .setCancelKeyEnabled(true)
 
     val popup = if (title.isNotBlank()) builder.setTitle(title).createPopup()
