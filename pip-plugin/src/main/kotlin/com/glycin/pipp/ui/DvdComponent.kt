@@ -6,15 +6,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.awt.Color
 import java.awt.Graphics
 import java.awt.Graphics2D
-import java.awt.Color
-import java.awt.event.ActionEvent
+import java.awt.KeyEventDispatcher
+import java.awt.KeyboardFocusManager
 import java.awt.event.KeyEvent
 import java.awt.image.BufferedImage
-import javax.swing.AbstractAction
 import javax.swing.JComponent
-import javax.swing.KeyStroke
 import kotlin.math.roundToInt
 
 class DvdComponent(
@@ -36,9 +35,16 @@ class DvdComponent(
     private var xSpeed = 1.0f
     private var ySpeed = 1.0f
 
+    private val escapeDispatcher = KeyEventDispatcher { e ->
+        if (e.id == KeyEvent.KEY_PRESSED && e.keyCode == KeyEvent.VK_ESCAPE) {
+            handleEscapeKey()
+            true
+        } else false
+    }
+
     init{
         dvdIcon.recolor()
-        setupEscapeKeyBinding()
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(escapeDispatcher)
         moveIcon()
     }
 
@@ -69,24 +75,10 @@ class DvdComponent(
         }
     }
 
-    private fun setupEscapeKeyBinding() {
-        val inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW)
-        val escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)
-
-        inputMap.put(escapeStroke, "escape")
-        actionMap.put("escape", object : AbstractAction() {
-            override fun actionPerformed(e: ActionEvent?) {
-                handleEscapeKey()
-            }
-        })
-    }
-
     private fun handleEscapeKey() {
-        println("ESC key pressed!")
+        if (!active) return
         active = false
-        val inputMap = getInputMap(WHEN_IN_FOCUSED_WINDOW)
-        inputMap.remove(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0))
-        actionMap.remove("escape")
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(escapeDispatcher)
         onExit(this)
     }
 }
