@@ -11,7 +11,7 @@ import {chat} from './http/client.js'
 const nanoId = () => randomBytes(10).toString('hex')
 
 export function App() {
-  const [state, setState] = useState<PipState>('SLEEPING')
+  const [state, setState] = useState<PipState>('IDLE')
   const [answer, setAnswer] = useState<string>('meow, ask me something')
   const [chatId] = useState<string>(() => nanoId())
   const revealed = useTypewriter(answer, 60)

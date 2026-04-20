@@ -37,5 +37,5 @@ export const CAT_FRAMES: Record<PipState, string[]> = {
 export const FRAME_INTERVAL_MS: Record<PipState, number> = {
   SLEEPING: 700,
   THINKING: 300,
-  IDLE: 1500,
+  IDLE: 200,
 }
