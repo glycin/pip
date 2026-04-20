@@ -1,5 +1,4 @@
 package com.glycin.pipserver
-
 import com.glycin.pipserver.chatter.ChatterResponse
 import com.glycin.pipserver.chatter.ChatterService
 import com.glycin.pipserver.chatter.GamerResponse

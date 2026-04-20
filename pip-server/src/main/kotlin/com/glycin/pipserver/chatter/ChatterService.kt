@@ -82,7 +82,7 @@ class ChatterService(
     fun game(request: PipRequestBody): GamerResponse? {
         LOG.info { "Gaming chatting agent ${Emojis.gamer} is handling request with id ${request.chatId}" }
         val response = with(request) {
-            pipChatter
+            pipToolless
                 .prompt(Prompt("""
                     $input
                 """.trimIndent()))
@@ -94,6 +94,10 @@ class ChatterService(
 
         return response?.let {
             val raw = it.withoutThinkTags()
+            if (raw.isBlank()) {
+                LOG.error { "Gamer response was empty after stripping think tags" }
+                return@let null
+            }
             objectMapper.parseToStructuredOutput<GamerResponse>(raw) { e ->
                 LOG.error { "Could not parse gamer response $raw because ${e.message} " }
             }

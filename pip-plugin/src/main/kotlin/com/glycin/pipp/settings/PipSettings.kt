@@ -6,8 +6,8 @@ import com.intellij.openapi.components.*
 @Service(Service.Level.APP)
 class PipSettings: SimplePersistentStateComponent<PipSettings.State>(State()) {
     class State: BaseState() {
-        var jsonExportPath by string("C:\\Projects\\pip\\pip-graph\\input.json")
-        var memeSaveFolder by string("C:\\Users\\lorda\\Desktop\\Pip\\memes")
+        var jsonExportPath by string("/Users/glycin/Projects/pip/pip-graph/input.json")
+        var memeSaveFolder by string("/Users/glycin/Projects/pip-artifacts")
         var enableAutoCritique by property(true)
     }
 }

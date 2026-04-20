@@ -42,13 +42,24 @@ class CoderService(
                 t.takeUnless { it.text.isEmpty() }
             }
             .joinToString { it.text }
-        //LOG.info { "Additional context: $additionalContext" }
+        LOG.info { "User Context: ${pipRequestBody.input} Additional context: $additionalContext" }
         val response = with(pipRequestBody) {
             pipCoder
                 .prompt(Prompt("""
+                    <user_request>
                     $input
-                    The validation agent said this about the query: ${judgement.reason}.
-                    ${if(additionalContext.isEmpty()) "" else "Here some additional context that riccardo has said relevant to this matter $additionalContext taken from a chat log. Use only if relevant." }
+                    </user_request>
+
+                    <judge_verdict>
+                    ${judgement.reason}
+                    </judge_verdict>
+
+                    ${if (additionalContext.isEmpty()) "" else """
+                    <riccardo_chat_log>
+                    $additionalContext
+                    </riccardo_chat_log>
+                    Use the chat log only if it is directly relevant.
+                    """.trimIndent()}
                 """.trimIndent()))
                 .system("${CoderPrompts.CODER_SYSTEM_PROMPT} ${if(think)"/think" else "/no_think"}")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
@@ -205,9 +216,20 @@ class CoderService(
         return with(pipRequestBody) {
             pipCoder
                 .prompt(Prompt("""
-                    $input.
-                    The validation agent said this about the query: ${judgement.reason}.
-                    Here some additional context that riccardo has said relevant to this matter $additionalContext taken from a chat log. Use only if relevant.
+                    <user_request>
+                    $input
+                    </user_request>
+
+                    <judge_verdict>
+                    ${judgement.reason}
+                    </judge_verdict>
+
+                    ${if (additionalContext.isEmpty()) "" else """
+                    <riccardo_chat_log>
+                    $additionalContext
+                    </riccardo_chat_log>
+                    Use the chat log only if it is directly relevant.
+                    """.trimIndent()}
                 """.trimIndent()))
                 .system("${CoderPrompts.CODER_SYSTEM_PROMPT} ${if (think) "/think" else "/no_think"}")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }

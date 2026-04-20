@@ -30,6 +30,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.awt.Point
+import java.io.File
 import javax.swing.JComponent
 import kotlin.math.max
 import kotlin.math.min
@@ -326,7 +327,7 @@ class PipResponseHandler(
 
     private fun PipResponse.showMeme() {
         if(memeFileName.isNullOrEmpty()) return
-        val path = "${pipSettings.state.memeSaveFolder}\\$memeFileName"
+        val path = File(pipSettings.state.memeSaveFolder, memeFileName).path
         println("Showing meme at path $path")
         scope.launch(Dispatchers.EDT) {
             showPngInPopup(agentComponent, path, listOf("I'm so funny", "Back to the 2010s!", "Miaouw?").random())

@@ -24,7 +24,7 @@ class MemeService(
 
     private val log = LoggerFactory.getLogger(SpotifyService::class.java)
 
-    @Tool(description = "Generate the 'one does not simply' meme. Use when you need a meme to indicate what the user wants to do is very hard.")
+    @Tool(description = "Generate the 'one does not simply' meme. Use when you need a meme to indicate what the user wants to do is very hard. Returns the generated meme's filename — put that exact string into the memeFileName field of your JSON response.")
     fun memeNotSimply(
         @ToolParam(description = "The bottom text for the meme. For example something like 'Write code in rust.'") bottomText: String,
     ): String {
@@ -32,7 +32,7 @@ class MemeService(
         return generateMemeBase64("one_does_not_simply.png", "One does not simply", bottomText)
     }
 
-    @Tool(description = "Generate the 'ancient aliens' meme. Use when you want to indicate that something is unexplainable.")
+    @Tool(description = "Generate the 'ancient aliens' meme. Use when you want to indicate that something is unexplainable. Returns the generated meme's filename — put that exact string into the memeFileName field of your JSON response.")
     fun memeAncientAliens(
         @ToolParam(description = "The top text for the meme. For example something like 'Your code when it runs without issues on the first run.'") topText: String,
     ): String {
@@ -40,7 +40,7 @@ class MemeService(
         return generateMemeBase64("ancient_aliens.png", topText, "Aliens")
     }
 
-    @Tool(description = "Generate the 'sad pablo escobar' meme. Use when you or the user are waiting for something for a long time.")
+    @Tool(description = "Generate the 'sad pablo escobar' meme. Use when you or the user are waiting for something for a long time. Returns the generated meme's filename — put that exact string into the memeFileName field of your JSON response.")
     fun memeSadPabloEscobar(
         @ToolParam(description = "The bottom text for the meme. For example something like 'Me waiting for the stand up to finish.'") bottomText: String,
     ): String {
@@ -48,7 +48,7 @@ class MemeService(
         return generateMemeBase64("sad_pablo.png", " ", bottomText)
     }
 
-    @Tool(description = "Generate the 'hide the pain' meme. Use when you want to indicate that something is sad and we are trying to hide it.")
+    @Tool(description = "Generate the 'hide the pain' meme. Use when you want to indicate that something is sad and we are trying to hide it. Returns the generated meme's filename — put that exact string into the memeFileName field of your JSON response.")
     fun memeHideThePain(
         @ToolParam(description = "The top text for the meme. For example something like 'My face when I see a pull request with 5000 changes.'") topText: String,
     ): String {
@@ -56,7 +56,7 @@ class MemeService(
         return generateMemeBase64("hide_the_pain.png", topText, " ")
     }
 
-    @Tool(description = "Generate the 'roll safe' meme. Use when you want show something clever has happened.")
+    @Tool(description = "Generate the 'roll safe' meme. Use when you want show something clever has happened. Returns the generated meme's filename — put that exact string into the memeFileName field of your JSON response.")
     fun memeThinkAboutIt(
         @ToolParam(description = "The top text for the meme. For example something like 'You can't be broke if you don't check your bank account.'") topText: String,
     ): String {
@@ -64,7 +64,7 @@ class MemeService(
         return generateMemeBase64("roll_safe.jpg", topText, " ")
     }
 
-    @Tool(description = "Generate the 'challenge accepted' meme. Use when you want to indicate something is challenging but that doesn't scare us!")
+    @Tool(description = "Generate the 'challenge accepted' meme. Use when you want to indicate something is challenging but that doesn't scare us! Returns the generated meme's filename — put that exact string into the memeFileName field of your JSON response.")
     fun memeChallengeAccepted(
         @ToolParam(description = "The top text for the meme. For example something like 'Write code without a compiler?'") topText: String,
     ): String {
@@ -189,10 +189,9 @@ class MemeService(
 
         graphics.dispose()
 
-        // Convert to Base64
-        val outputFile = File("${memeProperties.saveDirectory}//${UUID.randomUUID()}.png")
+        val outputFile = File(memeProperties.saveDirectory, "${UUID.randomUUID()}.png")
         val writeOk = ImageIO.write(image, "png", outputFile)
         if(!writeOk) return "Could not generate and save meme."
-        return "Generated meme and saved with name: ${outputFile.name}"
+        return outputFile.name
     }
 }
