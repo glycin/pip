@@ -124,15 +124,24 @@ class CoderService(
             pipCoder
                 .prompt(Prompt(
                 """
-                    Someone tried to paste the following at line $pasteLine:
+                    <pasted_text line="$pasteLine">
                     $pasteText
-                    Into this code:
-                    $document.
-                    Review the pasted text and add a TODO with any remarks you have on top of it. 
-                    Here some additional context taken from some chat logs:
-                    $additionalContext. Use only if relevant.
-                    """".trimIndent()))
-                .system("${CoderPrompts.CODER_SYSTEM_PROMPT} /no_think")
+                    </pasted_text>
+
+                    <target_document>
+                    $document
+                    </target_document>
+
+                    ${if (additionalContext.isEmpty()) "" else """
+                    <chat_log_context>
+                    $additionalContext
+                    </chat_log_context>
+                    Use the chat log only if it is directly relevant.
+                    """.trimIndent()}
+
+                    Produce one TODO comment that should go immediately above the pasted text at line $pasteLine.
+                """.trimIndent()))
+                .system("${CoderPrompts.PASTE_REVIEW_SYSTEM_PROMPT} /no_think")
                 .advisors { it.param(ChatMemory.CONVERSATION_ID, chatId) }
                 .call()
                 .content()

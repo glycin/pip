@@ -23,7 +23,7 @@ class PipPasteResponseHandler(
 ) {
 
     fun handleResponse(response: PipResponse) {
-        val todo = response.code?.first()?.code ?: "//TODO: Wow, for once you tried to paste something useful!"
+        val todo = response.code?.firstOrNull()?.code ?: "//TODO: Wow, for once you tried to paste something useful!"
         val textToPaste = """
             $todo
             ${request.pasteText}

@@ -31,4 +31,4 @@ meme:
   save-directory: ${SAVE_DIRECTORY}
 
 github:
-  repository-path: ~/Projects/pip
+  repository-path: /Users/glycin/Projects/pip
