@@ -29,7 +29,7 @@ export function SpeechBubble({
   const innerWidth = Math.max(10, width - 4)
   const lines = wrap(text, innerWidth)
   const top = '╭' + '─'.repeat(width - 2) + '╮'
-  const bot = '╰' + '─'.repeat(3) + '┬' + '─'.repeat(width - 6) + '╯'
+  const bot = '╰' + '─'.repeat(width - 6) + '┬' + '─'.repeat(3) + '╯'
   return (
     <Box flexDirection="column">
       <Text>{top}</Text>
@@ -37,7 +37,7 @@ export function SpeechBubble({
         <Text key={i}>│ {l.padEnd(innerWidth)} │</Text>
       ))}
       <Text>{bot}</Text>
-      <Text>    ▼</Text>
+      <Text>{' '.repeat(width - 5) + '▼'}</Text>
     </Box>
   )
 }

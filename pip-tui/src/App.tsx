@@ -16,8 +16,8 @@ type View = 'chat' | 'pong'
 const PONG_INTRO_MS = 3000
 
 export function App() {
-  const [state, setState] = useState<PipState>('IDLE')
-  const [answer, setAnswer] = useState<string>('meow, ask me something')
+  const [state, setState] = useState<PipState>('SLEEPING')
+  const [answer, setAnswer] = useState<string>("can't you see I'm sleeping? Meow")
   const [chatId] = useState<string>(() => nanoId())
   const [view, setView] = useState<View>('chat')
   const revealed = useTypewriter(answer, 60)
@@ -30,6 +30,7 @@ export function App() {
   const schedulePong = () => {
     pongTimer.current = setTimeout(() => {
       pongTimer.current = null
+      setState('PONG')
       setView('pong')
     }, PONG_INTRO_MS)
   }
@@ -57,7 +58,10 @@ export function App() {
     }
   }
 
-  const exitPong = () => setView('chat')
+  const exitPong = () => {
+    setView('chat')
+    setState('IDLE')
+  }
 
   const showBubble = view === 'chat' && state !== 'THINKING'
   const inputDisabled = state === 'THINKING' || view === 'pong'
