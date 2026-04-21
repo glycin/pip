@@ -2,7 +2,7 @@ import {readdirSync, readFileSync} from 'node:fs'
 import {dirname, join} from 'node:path'
 import {fileURLToPath} from 'node:url'
 
-export type PipState = 'SLEEPING' | 'THINKING' | 'IDLE' | 'PONG'
+export type PipState = 'INTRO' | 'SLEEPING' | 'THINKING' | 'IDLE' | 'PONG'
 
 const assetsDir = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -29,6 +29,7 @@ function loadFrames(state: PipState): string[] {
 }
 
 export const CAT_FRAMES: Record<PipState, string[]> = {
+  INTRO: loadFrames('INTRO'),
   SLEEPING: loadFrames('SLEEPING'),
   THINKING: loadFrames('THINKING'),
   IDLE: loadFrames('IDLE'),
@@ -36,6 +37,7 @@ export const CAT_FRAMES: Record<PipState, string[]> = {
 }
 
 export const FRAME_INTERVAL_MS: Record<PipState, number> = {
+  INTRO: 200,
   SLEEPING: 700,
   THINKING: 300,
   IDLE: 200,

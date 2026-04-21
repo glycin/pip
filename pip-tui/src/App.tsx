@@ -6,7 +6,7 @@ import {SpeechBubble} from './SpeechBubble.js'
 import {InputLine} from './InputLine.js'
 import {Pong} from './pong/Pong.js'
 import {useTypewriter} from './useTypewriter.js'
-import {PipState} from './state.js'
+import {CAT_FRAMES, FRAME_INTERVAL_MS, PipState} from './state.js'
 import {help} from './http/client.js'
 
 const nanoId = () => randomBytes(10).toString('hex')
@@ -14,9 +14,10 @@ const nanoId = () => randomBytes(10).toString('hex')
 type View = 'chat' | 'pong'
 
 const PONG_INTRO_MS = 3000
+const INTRO_DURATION_MS = CAT_FRAMES.INTRO.length * FRAME_INTERVAL_MS.INTRO
 
 export function App() {
-  const [state, setState] = useState<PipState>('SLEEPING')
+  const [state, setState] = useState<PipState>('INTRO')
   const [answer, setAnswer] = useState<string>("can't you see I'm sleeping? Meow")
   const [chatId] = useState<string>(() => nanoId())
   const [view, setView] = useState<View>('chat')
@@ -25,6 +26,11 @@ export function App() {
 
   useEffect(() => () => {
     if (pongTimer.current) clearTimeout(pongTimer.current)
+  }, [])
+
+  useEffect(() => {
+    const t = setTimeout(() => setState('SLEEPING'), INTRO_DURATION_MS)
+    return () => clearTimeout(t)
   }, [])
 
   const schedulePong = () => {
@@ -63,8 +69,8 @@ export function App() {
     setState('IDLE')
   }
 
-  const showBubble = view === 'chat' && state !== 'THINKING'
-  const inputDisabled = state === 'THINKING' || view === 'pong'
+  const showBubble = view === 'chat' && state !== 'THINKING' && state !== 'INTRO'
+  const inputDisabled = state === 'THINKING' || state === 'INTRO' || view === 'pong'
 
   return (
     <Box flexDirection="row" paddingX={1}>
