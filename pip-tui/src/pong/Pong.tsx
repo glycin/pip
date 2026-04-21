@@ -51,12 +51,12 @@ export function Pong({onExit}: {onExit: () => void}) {
 
   const status =
     s.status === 'won' ? 'YOU WIN!' :
-    s.status === 'lost' ? 'CPU WINS!' :
+    s.status === 'lost' ? 'AI WINS!' :
     'w/s or ↑/↓  —  q/esc to quit'
 
   return (
     <Box flexDirection="column" marginLeft={2}>
-      <Text>{`  PIP  ${s.score.player}  :  ${s.score.cpu}  CPU`}</Text>
+      <Text>{`  PIP  ${s.score.player}  :  ${s.score.cpu}  AI`}</Text>
       <Text>{TOP_BORDER}</Text>
       {rows.map((r, i) => <Text key={i}>{`│${r}│`}</Text>)}
       <Text>{BOT_BORDER}</Text>
