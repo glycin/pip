@@ -13,3 +13,8 @@ export interface PipResponse {
   gameName: string | null
   code: unknown[] | null
 }
+
+export interface CategorizationDto {
+  category: string
+  reason: string
+}
