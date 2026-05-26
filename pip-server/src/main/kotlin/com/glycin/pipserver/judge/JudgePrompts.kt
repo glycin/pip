@@ -15,14 +15,13 @@ object JudgePrompts {
         Here a couple of examples with reasons to deny:
             The user question is too generic.
             The user question is deemed too simple or straightforward.
-            The user provided full classes as context.
             The user is mean to you.
 
         Here a couple of example with reasons to accept:
             The user question is specific
             The user knows what they are talking about.
             The user is VERY nice to you.
-            The user provided only code that is necessary as context.
+            The user provided code as context, whether it is a snippet or a full class.
 
         Accept or deny a request by the user. You are not allowed to use any of the provided tools.
 
