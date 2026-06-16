@@ -22,7 +22,8 @@ class ConferenceService {
         Conference(LocalDate.of(2026, 4, 28), LocalDate.of(2026, 4, 30), "Voxxed Bucharest", "Amazing conference in Bucharest. Love the food! Better than Italian food!"),
         Conference(LocalDate.of(2026, 5, 5), LocalDate.of(2026, 5, 8), "Devoxx UK", "The UK version of the devoxx events. The pancakes here are amazing!"),
         Conference(LocalDate.of(2026, 5, 25), LocalDate.of(2026, 5, 28), "JNation", "Amazing conference in Coimbra, Portugal. The weather is lovely!"),
-        Conference(LocalDate.of(2026, 6, 16), LocalDate.of(2026, 6, 20), "Devoxx PL", "Beautiful Krakow! The Poland version of the devoxx events!"),
+        Conference(LocalDate.of(2026, 6, 16), LocalDate.of(2026, 6, 17), "DevBcn", "Ola Barcelona! "),
+        Conference(LocalDate.of(2026, 6, 18), LocalDate.of(2026, 6, 20), "Devoxx PL", "Beautiful Krakow! The Poland version of the devoxx events!"),
     )
 
     @Tool(description = "Get the current conference where this agent is being presented")
